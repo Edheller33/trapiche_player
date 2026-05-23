@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0d0600">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Trapiche Bistro · Fuego en la Cocina</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:       #0a0400;
+      --bg2:      #130800;
+      --copper:   #b87333;
+      --gold:     #d4a84b;
+      --gold-lt:  #f0c96a;
+      --cream:    #f5e6c8;
+      --dim:      #6b4f2e;
+      --rust:     #7a2e0e;
+      --ember:    #c44a1a;
+      --glow:     rgba(212,168,75,0.3);
+      --glow2:    rgba(184,115,51,0.18);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%; width: 100%;
+      background: var(--bg);
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+
+    /* ── Fondo con textura y resplandor ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 55% at 50% 0%, rgba(184,115,51,0.14) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 50% at 15% 85%, rgba(122,46,14,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 85% 70%, rgba(196,74,26,0.1) 0%, transparent 55%),
+        repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 3px,
+          rgba(184,115,51,0.025) 3px,
+          rgba(184,115,51,0.025) 6px
+        );
+      pointer-events: none;
+    }
+
+    /* partículas de brasa */
+    .ember {
+      position: fixed;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--gold-lt);
+      box-shadow: 0 0 6px var(--gold), 0 0 12px var(--ember);
+      pointer-events: none;
+      animation: floatEmber var(--ed, 8s) ease-in var(--delay, 0s) infinite;
+      opacity: 0;
+    }
+    @keyframes floatEmber {
+      0%   { transform: translate(0, 0) scale(1);   opacity: 0; }
+      10%  { opacity: 0.9; }
+      80%  { opacity: 0.5; }
+      100% { transform: translate(var(--dx,20px), -160px) scale(0.2); opacity: 0; }
+    }
+
+    /* ── Escena principal ── */
+    .scene {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 36px 20px 44px;
+    }
+
+    /* ── Medallón ── */
+    .medallion-wrap {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .medallion-outer {
+      position: absolute;
+      inset: -16px; border-radius: 50%;
+      border: 1.5px solid transparent;
+      background: conic-gradient(
+        var(--gold), var(--copper), var(--rust), var(--ember), var(--gold)
+      ) border-box;
+      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude;
+      animation: ringRotate 10s linear infinite;
+      opacity: 0.65;
+    }
+    .medallion-inner {
+      position: absolute;
+      inset: -6px; border-radius: 50%;
+      border: 1px solid rgba(212,168,75,0.2);
+      animation: ringRotate 6s linear infinite reverse;
+    }
+    @keyframes ringRotate { to { transform: rotate(360deg); } }
+
+    .logo-img {
+      width: 128px; height: 128px; border-radius: 50%;
+      object-fit: cover; display: block;
+      box-shadow:
+        0 0 0 3px rgba(212,168,75,0.25),
+        0 0 40px var(--glow2),
+        0 0 90px rgba(184,115,51,0.1);
+    }
+
+    /* ── Títulos ── */
+    .brand-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 38px; font-style: italic; font-weight: 400;
+      color: var(--gold); letter-spacing: 0.5px; text-align: center;
+      text-shadow: 0 0 30px rgba(212,168,75,0.5), 0 2px 4px rgba(0,0,0,0.6);
+      margin-bottom: 5px;
+    }
+    .brand-sub {
+      font-size: 11.5px; letter-spacing: 5px; color: var(--copper);
+      text-transform: uppercase; text-align: center; margin-bottom: 6px;
+      opacity: 0.85;
+    }
+
+    /* ── Ornamento ── */
+    .ornament {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 24px; width: 100%; max-width: 280px;
+    }
+    .ornament-line {
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--copper), transparent);
+      opacity: 0.6;
+    }
+    .ornament-diamond {
+      width: 7px; height: 7px;
+      background: var(--gold); transform: rotate(45deg);
+      flex-shrink: 0;
+      box-shadow: 0 0 8px var(--glow);
+    }
+
+    /* ── Nombre canción ── */
+    .song-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px; font-style: italic; font-weight: 400;
+      color: var(--cream); letter-spacing: 0.5px;
+      text-align: center;
+      opacity: 0.9;
+      margin-top: 10px;
+    }
+    .song-artist {
+      font-size: 12px; letter-spacing: 2.5px;
+      color: var(--dim); text-transform: uppercase;
+      text-align: center; margin-top: 3px;
+    }
+
+    /* ── Card del reproductor ── */
+    .player-card {
+      width: 100%; max-width: 350px;
+      background: linear-gradient(
+        158deg,
+        rgba(22,10,2,0.97) 0%,
+        rgba(10,4,0,0.99) 100%
+      );
+      border: 1px solid rgba(184,115,51,0.35);
+      border-radius: 22px;
+      padding: 26px 22px 22px;
+      box-shadow:
+        0 0 0 1px rgba(212,168,75,0.06),
+        0 24px 70px rgba(0,0,0,0.75),
+        inset 0 1px 0 rgba(212,168,75,0.18),
+        inset 0 -1px 0 rgba(184,115,51,0.08);
+      position: relative; overflow: hidden;
+    }
+    .player-card::before {
+      content: '';
+      position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-lt), transparent);
+      opacity: 0.5;
+    }
+    .player-card::after {
+      content: '';
+      position: absolute; inset: 0; border-radius: 22px;
+      background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(212,168,75,0.06), transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Logo mini dentro de la card */
+    .track-header {
+      display: flex; flex-direction: column; align-items: center;
+      margin-bottom: 18px; gap: 10px;
+    }
+    .player-logo-wrap { position: relative; }
+    .player-logo {
+      width: 72px; height: 72px; border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 20px rgba(184,115,51,0.4), 0 0 0 2px rgba(212,168,75,0.2);
+    }
+    .vinyl-spin {
+      position: absolute; inset: -4px; border-radius: 50%;
+      border: 1.5px dashed rgba(212,168,75,0.25);
+      animation: ringRotate 4s linear infinite;
+    }
+    .vinyl-spin.paused { animation-play-state: paused; }
+
+    /* ── Waveform ── */
+    .waveform-wrap {
+      margin-bottom: 14px;
+      height: 44px;
+      display: flex; align-items: center; gap: 2.5px;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .wave-bar {
+      width: 3px; border-radius: 3px;
+      background: rgba(184,115,51,0.25);
+      transition: background 0.3s;
+    }
+    .wave-bar.active {
+      background: linear-gradient(to top, var(--ember), var(--gold));
+      animation: wavePulse var(--dur, 0.7s) ease-in-out infinite alternate;
+    }
+    .wave-bar.played {
+      background: linear-gradient(to top, var(--rust), var(--copper));
+      opacity: 0.8;
+    }
+    @keyframes wavePulse {
+      from { transform: scaleY(0.3); }
+      to   { transform: scaleY(1); }
+    }
+
+    /* ── Barra de progreso ── */
+    .progress-wrap {
+      margin-bottom: 7px; height: 5px;
+      background: rgba(184,115,51,0.15);
+      border-radius: 3px; cursor: pointer;
+      position: relative; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--rust), var(--ember), var(--gold));
+      border-radius: 3px; width: 0%;
+      transition: width 0.25s linear;
+      pointer-events: none;
+    }
+    .progress-thumb {
+      position: absolute; top: 50%; width: 11px; height: 11px;
+      background: var(--gold-lt);
+      border-radius: 50%; transform: translate(-50%, -50%);
+      box-shadow: 0 0 8px var(--glow);
+      left: 0%; transition: left 0.25s linear;
+      pointer-events: none;
+    }
+
+    .time-row {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: var(--dim);
+      letter-spacing: 1px; margin-bottom: 22px;
+      font-variant-numeric: tabular-nums;
+    }
+    #time-current { color: var(--copper); }
+
+    /* ── Controles ── */
+    .controls {
+      display: flex; align-items: center;
+      justify-content: center; gap: 18px;
+      margin-bottom: 20px;
+    }
+    .btn-aux {
+      width: 50px; height: 50px; border-radius: 50%;
+      background: rgba(184,115,51,0.08);
+      border: 1px solid rgba(184,115,51,0.22);
+      color: var(--copper); font-size: 19px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.18s;
+      -webkit-tap-highlight-color: transparent; user-select: none;
+    }
+    .btn-aux:hover  { background: rgba(184,115,51,0.18); border-color: rgba(212,168,75,0.4); }
+    .btn-aux:active { transform: scale(0.88); background: rgba(184,115,51,0.28); }
+
+    .btn-play {
+      width: 68px; height: 68px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--gold-lt), var(--gold), var(--copper));
+      border: none; color: var(--bg); font-size: 24px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow:
+        0 0 0 6px rgba(212,168,75,0.12),
+        0 0 22px rgba(212,168,75,0.35),
+        0 4px 14px rgba(0,0,0,0.5);
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent; user-select: none;
+      position: relative;
+    }
+    .btn-play::before {
+      content: '';
+      position: absolute; inset: -4px; border-radius: 50%;
+      border: 1px solid rgba(212,168,75,0.3);
+      animation: pulsering 2s ease-out infinite;
+      opacity: 0;
+    }
+    .btn-play.playing::before { opacity: 1; }
+    @keyframes pulsering {
+      0%   { transform: scale(1);    opacity: 0.6; }
+      100% { transform: scale(1.35); opacity: 0; }
+    }
+    .btn-play:hover  { box-shadow: 0 0 0 8px rgba(212,168,75,0.15), 0 0 32px rgba(212,168,75,0.5), 0 4px 14px rgba(0,0,0,0.5); }
+    .btn-play:active { transform: scale(0.92); }
+
+    /* ── Volumen ── */
+    .volume-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .vol-icon { font-size: 15px; color: var(--dim); flex-shrink: 0; }
+    .vol-slider {
+      flex: 1; -webkit-appearance: none; appearance: none;
+      height: 3px; border-radius: 2px;
+      background: rgba(184,115,51,0.2); cursor: pointer; outline: none;
+    }
+    .vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: radial-gradient(circle, var(--gold-lt), var(--gold));
+      box-shadow: 0 0 6px var(--glow);
+      cursor: pointer;
+    }
+    .vol-slider::-moz-range-thumb {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--gold); border: none;
+    }
+
+    /* ── Status ── */
+    .status-msg {
+      text-align: center; font-size: 12.5px;
+      letter-spacing: 1.5px; color: var(--dim);
+      margin-top: 14px; min-height: 18px;
+      font-style: italic; transition: color 0.3s;
+    }
+    .status-msg.error  { color: #d94f2a; }
+    .status-msg.ok     { color: var(--copper); }
+    .status-msg.play   { color: var(--gold); }
+
+    /* ── Footer ── */
+    .footer-note {
+      margin-top: 26px;
+      font-size: 11px; letter-spacing: 4px;
+      color: rgba(184,115,51,0.45); text-transform: uppercase;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Brasas flotantes -->
+<div class="ember" style="left:15%;--delay:0s;  --ed:9s;  --dx:30px"></div>
+<div class="ember" style="left:30%;--delay:1.5s;--ed:11s; --dx:-20px"></div>
+<div class="ember" style="left:50%;--delay:0.7s;--ed:8s;  --dx:15px"></div>
+<div class="ember" style="left:65%;--delay:2.2s;--ed:10s; --dx:-35px"></div>
+<div class="ember" style="left:80%;--delay:3.1s;--ed:12s; --dx:25px"></div>
+<div class="ember" style="left:42%;--delay:4s;  --ed:9.5s;--dx:-10px"></div>
+<div class="ember" style="left:72%;--delay:5.3s;--ed:7.5s;--dx:18px"></div>
+
+<div class="scene">
+
+  <!-- Medallón -->
+  <div class="medallion-wrap">
+    <div class="medallion-outer"></div>
+    <div class="medallion-inner"></div>
+    <img class="logo-img"
+         src="logo_trapiche.png"
+         onerror="this.src='https://placehold.co/128x128/1a0800/d4a84b?text=TB'"
+         alt="Trapiche Bistro">
+  </div>
+
+  <h1 class="brand-title">Trapiche Bistro</h1>
+  <p class="brand-sub">Cocina Regional Sinaloense</p>
+
+  <div class="ornament">
+    <div class="ornament-line"></div>
+    <div class="ornament-diamond"></div>
+    <div class="ornament-line"></div>
+  </div>
+
+  <!-- Card del reproductor -->
+  <div class="player-card">
+
+    <div class="track-header">
+      <div class="player-logo-wrap">
+        <img class="player-logo"
+             src="logo_trapiche.png"
+             onerror="this.src='https://placehold.co/72x72/1a0800/d4a84b?text=TB'"
+             alt="logo">
+        <div class="vinyl-spin paused" id="vinyl-ring"></div>
+      </div>
+      <div>
+        <div class="song-title">Fuego en la Cocina</div>
+        <div class="song-artist">Trapiche Bistro</div>
+      </div>
+    </div>
+
+    <!-- Waveform -->
+    <div class="waveform-wrap" id="waveform"></div>
+
+    <!-- Progreso -->
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-fill"  id="progress-fill"></div>
+      <div class="progress-thumb" id="progress-thumb"></div>
+    </div>
+    <div class="time-row">
+      <span id="time-current">0:00</span>
+      <span id="time-total">0:00</span>
+    </div>
+
+    <!-- Controles -->
+    <div class="controls">
+      <button class="btn-aux" id="btn-rewind"  title="-15 seg">&#9198;</button>
+      <button class="btn-play" id="btn-play">&#9654;</button>
+      <button class="btn-aux" id="btn-forward" title="+15 seg">&#9197;</button>
+    </div>
+
+    <!-- Volumen -->
+    <div class="volume-row">
+      <span class="vol-icon">&#128264;</span>
+      <input type="range" class="vol-slider" id="vol-slider" min="0" max="1" step="0.02" value="1">
+      <span class="vol-icon">&#128266;</span>
+    </div>
+
+    <div class="status-msg" id="status-msg">Cargando audio…</div>
+  </div>
+
+  <p class="footer-note">Escanea &middot; Escucha &middot; Disfruta</p>
+</div>
+
+<!-- Audio: el MP3 debe estar en la raíz del repositorio -->
+<audio id="audio-el" preload="auto" src="fuego_en_la_cocina_v10.mp3"></audio>
+
+<script>
+  /* ── Refs ── */
+  const audio      = document.getElementById('audio-el');
+  const btnPlay    = document.getElementById('btn-play');
+  const btnRew     = document.getElementById('btn-rewind');
+  const btnFwd     = document.getElementById('btn-forward');
+  const progWrap   = document.getElementById('progress-wrap');
+  const progFill   = document.getElementById('progress-fill');
+  const progThumb  = document.getElementById('progress-thumb');
+  const timeCur    = document.getElementById('time-current');
+  const timeTot    = document.getElementById('time-total');
+  const volSlide   = document.getElementById('vol-slider');
+  const statusEl   = document.getElementById('status-msg');
+  const waveEl     = document.getElementById('waveform');
+  const vinylRing  = document.getElementById('vinyl-ring');
+
+  /* ── Waveform ── */
+  const bars = [];
+  const BAR_COUNT = 32;
+  const heights   = Array.from({ length: BAR_COUNT }, () => 6 + Math.random() * 22);
+
+  for (let i = 0; i < BAR_COUNT; i++) {
+    const b = document.createElement('div');
+    b.className = 'wave-bar';
+    b.style.height = heights[i] + 'px';
+    b.style.setProperty('--dur', (0.45 + Math.random() * 0.75).toFixed(2) + 's');
+    b.style.animationDelay = (i * 0.038).toFixed(2) + 's';
+    waveEl.appendChild(b);
+    bars.push(b);
+  }
+
+  function updateWaveBars(pct) {
+    const pivot = Math.floor(pct * BAR_COUNT);
+    bars.forEach((b, i) => {
+      b.classList.remove('active', 'played');
+      if (i < pivot) b.classList.add('played');
+    });
+  }
+
+  function startWave() {
+    const pivot = Math.floor((audio.currentTime / (audio.duration || 1)) * BAR_COUNT);
+    bars.forEach((b, i) => {
+      if (i >= pivot) b.classList.add('active');
+    });
+    vinylRing.classList.remove('paused');
+  }
+  function stopWave() {
+    bars.forEach(b => b.classList.remove('active'));
+    vinylRing.classList.add('paused');
+  }
+
+  /* ── Utilidades ── */
+  function fmt(s) {
+    if (!isFinite(s)) return '0:00';
+    return Math.floor(s / 60) + ':' + Math.floor(s % 60).toString().padStart(2, '0');
+  }
+  function setStatus(msg, cls) {
+    statusEl.textContent = msg;
+    statusEl.className = 'status-msg' + (cls ? ' ' + cls : '');
+  }
+
+  /* ── Eventos de audio ── */
+  audio.addEventListener('canplay',        () => setStatus('Listo para reproducir', 'ok'));
+  audio.addEventListener('loadedmetadata', () => { timeTot.textContent = fmt(audio.duration); });
+  audio.addEventListener('error',          () => setStatus('No se encontró el audio. Sube el MP3 al repo.', 'error'));
+  audio.addEventListener('waiting',        () => setStatus('Cargando…'));
+  audio.addEventListener('stalled',        () => setStatus('Cargando…'));
+
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const pct = audio.currentTime / audio.duration;
+    const pctStr = (pct * 100).toFixed(2) + '%';
+    progFill.style.width  = pctStr;
+    progThumb.style.left  = pctStr;
+    timeCur.textContent   = fmt(audio.currentTime);
+    if (audio.paused) updateWaveBars(pct);
+  });
+
+  audio.addEventListener('ended', () => {
+    btnPlay.innerHTML = '&#9654;';
+    btnPlay.classList.remove('playing');
+    stopWave();
+    updateWaveBars(1);
+    setStatus('— Fin —', 'ok');
+    progFill.style.width = '100%';
+    progThumb.style.left = '100%';
+  });
+
+  /* ── Play / Pausa ── */
+  btnPlay.addEventListener('click', async () => {
+    if (audio.paused) {
+      try {
+        await audio.play();
+        btnPlay.innerHTML = '&#9646;&#9646;';
+        btnPlay.classList.add('playing');
+        startWave();
+        setStatus('Reproduciendo…', 'play');
+      } catch (e) {
+        setStatus('Toca de nuevo para reproducir.', 'error');
+      }
+    } else {
+      audio.pause();
+      btnPlay.innerHTML = '&#9654;';
+      btnPlay.classList.remove('playing');
+      stopWave();
+      setStatus('Pausado');
+    }
+  });
+
+  /* ── Rebobinar / Adelantar ── */
+  btnRew.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 15); });
+  btnFwd.addEventListener('click', () => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 15); });
+
+  /* ── Click en barra de progreso ── */
+  progWrap.addEventListener('click', e => {
+    if (!audio.duration) return;
+    const r = progWrap.getBoundingClientRect();
+    audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+  });
+
+  /* ── Volumen ── */
+  volSlide.addEventListener('input', () => { audio.volume = parseFloat(volSlide.value); });
+</script>
+</body>
+</html>
