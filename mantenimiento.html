@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0d0600">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Trapiche Bistro · En mantenimiento</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:      #0a0400;
+      --copper:  #b87333;
+      --gold:    #d4a84b;
+      --gold-lt: #f0c96a;
+      --cream:   #f5e6c8;
+      --dim:     #6b4f2e;
+      --rust:    #7a2e0e;
+      --ember:   #c44a1a;
+      --glow:    rgba(212,168,75,0.3);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%; width: 100%;
+      background: var(--bg);
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--cream);
+      overflow: hidden;
+    }
+
+    /* fondo textura */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 55% at 50% 0%,  rgba(184,115,51,0.16) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 50% at 15% 85%, rgba(122,46,14,0.20)  0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 85% 70%, rgba(196,74,26,0.12)  0%, transparent 55%),
+        repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(184,115,51,0.03) 3px, rgba(184,115,51,0.03) 6px);
+      pointer-events: none;
+    }
+
+    /* brasas flotantes */
+    .ember {
+      position: fixed; width: 3px; height: 3px; border-radius: 50%;
+      background: var(--gold-lt);
+      box-shadow: 0 0 6px var(--gold), 0 0 12px var(--ember);
+      pointer-events: none;
+      animation: floatEmber var(--ed, 9s) ease-in var(--delay, 0s) infinite;
+      opacity: 0;
+    }
+    @keyframes floatEmber {
+      0%   { transform: translate(0,0) scale(1);              opacity: 0; }
+      10%  { opacity: 0.9; }
+      80%  { opacity: 0.4; }
+      100% { transform: translate(var(--dx,20px),-180px) scale(0.15); opacity: 0; }
+    }
+
+    /* escena */
+    .scene {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40px 24px 50px;
+      gap: 0;
+      text-align: center;
+    }
+
+    /* medallón */
+    .medallion-wrap { position: relative; margin-bottom: 22px; }
+    .medallion-outer {
+      position: absolute; inset: -18px; border-radius: 50%;
+      border: 1.5px solid transparent;
+      background: conic-gradient(var(--gold),var(--copper),var(--rust),var(--ember),var(--gold)) border-box;
+      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out; mask-composite: exclude;
+      animation: ringRotate 12s linear infinite; opacity: 0.6;
+    }
+    .medallion-inner {
+      position: absolute; inset: -7px; border-radius: 50%;
+      border: 1px solid rgba(212,168,75,0.18);
+      animation: ringRotate 7s linear infinite reverse;
+    }
+    @keyframes ringRotate { to { transform: rotate(360deg); } }
+
+    .logo-img {
+      width: 110px; height: 110px; border-radius: 50%;
+      object-fit: cover; display: block;
+      box-shadow: 0 0 0 3px rgba(212,168,75,0.2),
+                  0 0 40px rgba(184,115,51,0.2),
+                  0 0 90px rgba(184,115,51,0.09);
+    }
+
+    /* marca */
+    .brand-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px; font-style: italic; font-weight: 400;
+      color: var(--gold);
+      text-shadow: 0 0 30px rgba(212,168,75,0.5), 0 2px 4px rgba(0,0,0,0.7);
+      margin-bottom: 4px;
+    }
+    .brand-sub {
+      font-size: 10px; letter-spacing: 5px; color: var(--copper);
+      text-transform: uppercase; opacity: 0.85; margin-bottom: 24px;
+    }
+
+    /* ornamento */
+    .ornament {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 28px; width: 100%; max-width: 260px;
+    }
+    .ornament-line { flex: 1; height: 1px; background: linear-gradient(90deg,transparent,var(--copper),transparent); opacity: 0.55; }
+    .ornament-diamond { width: 7px; height: 7px; background: var(--gold); transform: rotate(45deg); flex-shrink: 0; box-shadow: 0 0 8px var(--glow); }
+
+    /* ícono herramienta */
+    .wrench-icon {
+      font-size: 52px;
+      margin-bottom: 16px;
+      animation: wrenchPulse 2.4s ease-in-out infinite;
+      filter: drop-shadow(0 0 14px rgba(212,168,75,0.45));
+    }
+    @keyframes wrenchPulse {
+      0%,100% { transform: rotate(-8deg) scale(1);    opacity: 1; }
+      50%      { transform: rotate( 8deg) scale(1.08); opacity: 0.75; }
+    }
+
+    /* card principal */
+    .banner-card {
+      width: 100%; max-width: 340px;
+      background: rgba(20,8,0,0.78);
+      border: 1px solid rgba(212,168,75,0.28);
+      border-radius: 18px;
+      padding: 28px 26px 26px;
+      box-shadow: 0 0 40px rgba(184,115,51,0.12), 0 0 80px rgba(0,0,0,0.5);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .banner-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px; font-style: italic;
+      color: var(--gold-lt);
+      text-shadow: 0 0 20px rgba(240,201,106,0.4);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .banner-tagline {
+      font-size: 13px; letter-spacing: 3px;
+      color: var(--copper); text-transform: uppercase;
+      opacity: 0.9; margin-bottom: 20px;
+    }
+
+    .divider {
+      width: 60px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto 20px;
+      opacity: 0.6;
+    }
+
+    .banner-body {
+      font-size: 16px; line-height: 1.7;
+      color: var(--cream); opacity: 0.88;
+      margin-bottom: 22px;
+    }
+    .banner-body strong {
+      color: var(--gold-lt); font-weight: 600;
+    }
+
+    /* barra de progreso animada */
+    .progress-wrap {
+      width: 100%; height: 4px;
+      background: rgba(212,168,75,0.12);
+      border-radius: 2px; overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--rust), var(--gold), var(--copper));
+      border-radius: 2px;
+      animation: progressLoop 2.8s ease-in-out infinite;
+    }
+    @keyframes progressLoop {
+      0%   { width: 0%;   margin-left: 0%; }
+      50%  { width: 60%;  margin-left: 20%; }
+      100% { width: 0%;   margin-left: 100%; }
+    }
+
+    .banner-note {
+      font-size: 12px; letter-spacing: 1.5px;
+      color: var(--dim); text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    /* ornamento inferior */
+    .ornament-bottom {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 28px; width: 100%; max-width: 260px;
+    }
+
+    .footer-note {
+      font-size: 11px; letter-spacing: 3px;
+      color: var(--dim); text-transform: uppercase;
+      margin-top: 20px; opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- brasas -->
+  <div class="ember" style="left:12%;bottom:-10px;--ed:10s;--delay:0s;--dx:18px"></div>
+  <div class="ember" style="left:28%;bottom:-10px;--ed:8s; --delay:1.2s;--dx:-14px"></div>
+  <div class="ember" style="left:50%;bottom:-10px;--ed:12s;--delay:0.5s;--dx:22px"></div>
+  <div class="ember" style="left:68%;bottom:-10px;--ed:9s; --delay:2s;  --dx:-20px"></div>
+  <div class="ember" style="left:82%;bottom:-10px;--ed:11s;--delay:0.8s;--dx:10px"></div>
+  <div class="ember" style="left:40%;bottom:-10px;--ed:7s; --delay:3s;  --dx:-8px"></div>
+
+  <div class="scene">
+
+    <!-- logo -->
+    <div class="medallion-wrap">
+      <div class="medallion-outer"></div>
+      <div class="medallion-inner"></div>
+      <img class="logo-img"
+           src="logo_trapiche.png"
+           onerror="this.src='https://placehold.co/110x110/1a0800/d4a84b?text=TB'"
+           alt="Trapiche Bistro">
+    </div>
+
+    <h1 class="brand-title">Trapiche Bistro</h1>
+    <p class="brand-sub">Cocina Regional Sinaloense</p>
+
+    <div class="ornament">
+      <div class="ornament-line"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-line"></div>
+    </div>
+
+    <!-- card -->
+    <div class="banner-card">
+
+      <div class="wrench-icon">🔧</div>
+
+      <h2 class="banner-headline">Estamos trabajando<br>en algo especial</h2>
+      <p class="banner-tagline">Actualización en proceso</p>
+
+      <div class="divider"></div>
+
+      <p class="banner-body">
+        Nuestra experiencia musical está siendo
+        <strong>renovada para ti</strong>.<br>
+        Regresa en unos momentos y disfruta
+        la nueva selección de Trapiche Bistro.
+      </p>
+
+      <div class="progress-wrap">
+        <div class="progress-bar"></div>
+      </div>
+
+      <p class="banner-note">Volvemos pronto &middot; Gracias por tu paciencia</p>
+
+    </div>
+
+    <div class="ornament-bottom">
+      <div class="ornament-line"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-line"></div>
+    </div>
+
+    <p class="footer-note">Escanea &middot; Escucha &middot; Disfruta</p>
+
+  </div>
+
+  <script>
+    // Brasas extra aleatorias
+    for (let i = 0; i < 4; i++) {
+      const e = document.createElement('div');
+      e.className = 'ember';
+      e.style.cssText = `
+        left:${10 + Math.random()*80}%;
+        bottom:-10px;
+        --ed:${7+Math.random()*6}s;
+        --delay:${Math.random()*4}s;
+        --dx:${(Math.random()-0.5)*40}px
+      `;
+      document.body.appendChild(e);
+    }
+  </script>
+</body>
+</html>
