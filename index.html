@@ -1,626 +1,2777 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" dir="ltr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0d0600">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Trapiche Bistro · Música</title>
+  <meta name="apple-mobile-web-app-title" content="Trapiche">
+  <meta name="application-name" content="Trapiche Timer">
+  <meta name="description" content="Control de tiempos para cocina profesional Lean - Restaurante Trapiche">
+  <meta name="keywords" content="cocina, timer, lean, restaurante, temporizador">
+  <meta name="author" content="Trapiche Kitchen">
+  <meta property="og:title" content="Trapiche Timer">
+  <meta property="og:description" content="Control de tiempos para cocina profesional">
+  <meta property="og:type" content="website">
+  <meta name="format-detection" content="telephone=no">
+  <title>Trapiche Timer</title>
+
+  <!-- Manifiesto PWA embebido como data URI -->
+  <link rel="manifest" id="manifest-link">
+
+  <!-- Google Fonts: Bebas Neue para dígitos + Barlow Condensed para UI -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 
   <style>
+    /* ============================================================
+       VARIABLES Y RESET GLOBAL
+    ============================================================ */
     :root {
-      --bg:      #0a0400;
-      --copper:  #b87333;
-      --gold:    #d4a84b;
-      --gold-lt: #f0c96a;
-      --cream:   #f5e6c8;
-      --dim:     #6b4f2e;
-      --rust:    #7a2e0e;
-      --ember:   #c44a1a;
-      --glow:    rgba(212,168,75,0.3);
+      --bg:          #0a0a0a;
+      --bg2:         #111111;
+      --bg3:         #1a1a1a;
+      --surface:     #1e1e1e;
+      --border:      #2a2a2a;
+      --orange:      #ff6b00;
+      --orange-dim:  #cc5500;
+      --red:         #ff2020;
+      --yellow:      #ffcc00;
+      --green:       #22c55e;
+      --text:        #f0f0f0;
+      --text-dim:    #888;
+      --radius:      12px;
+      --tap:         60px;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      height: 100%; width: 100%;
-      background: var(--bg);
-      font-family: 'Cormorant Garamond', serif;
-      color: var(--cream);
-      overflow-x: hidden;
-    }
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0;
-      background:
-        radial-gradient(ellipse 90% 55% at 50% 0%,   rgba(184,115,51,0.14) 0%, transparent 65%),
-        radial-gradient(ellipse 50% 50% at 15% 85%,  rgba(122,46,14,0.18)  0%, transparent 60%),
-        radial-gradient(ellipse 40% 40% at 85% 70%,  rgba(196,74,26,0.10)  0%, transparent 55%),
-        repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(184,115,51,0.025) 3px, rgba(184,115,51,0.025) 6px);
-      pointer-events: none;
-    }
-
-    /* brasas */
-    .ember {
-      position: fixed; width: 3px; height: 3px; border-radius: 50%;
-      background: var(--gold-lt);
-      box-shadow: 0 0 6px var(--gold), 0 0 12px var(--ember);
-      pointer-events: none;
-      animation: floatEmber var(--ed,8s) ease-in var(--delay,0s) infinite;
-      opacity: 0;
-    }
-    @keyframes floatEmber {
-      0%   { transform: translate(0,0) scale(1);    opacity: 0; }
-      10%  { opacity: 0.9; }
-      80%  { opacity: 0.5; }
-      100% { transform: translate(var(--dx,20px),-160px) scale(0.2); opacity: 0; }
-    }
-
-    .scene {
-      position: relative; z-index: 1;
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 36px 20px 44px;
-      gap: 0;
-    }
-
-    /* medallón */
-    .medallion-wrap { position: relative; margin-bottom: 18px; }
-    .medallion-outer {
-      position: absolute; inset: -16px; border-radius: 50%;
-      border: 1.5px solid transparent;
-      background: conic-gradient(var(--gold),var(--copper),var(--rust),var(--ember),var(--gold)) border-box;
-      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: destination-out; mask-composite: exclude;
-      animation: ringRotate 10s linear infinite; opacity: 0.65;
-    }
-    .medallion-inner {
-      position: absolute; inset: -6px; border-radius: 50%;
-      border: 1px solid rgba(212,168,75,0.2);
-      animation: ringRotate 6s linear infinite reverse;
-    }
-    @keyframes ringRotate { to { transform: rotate(360deg); } }
-    .logo-img {
-      width: 118px; height: 118px; border-radius: 50%;
-      object-fit: cover; display: block;
-      box-shadow: 0 0 0 3px rgba(212,168,75,0.2), 0 0 40px rgba(184,115,51,0.18), 0 0 90px rgba(184,115,51,0.08);
-    }
-
-    .brand-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 34px; font-style: italic; font-weight: 400;
-      color: var(--gold); text-align: center;
-      text-shadow: 0 0 30px rgba(212,168,75,0.5), 0 2px 4px rgba(0,0,0,0.6);
-      margin-bottom: 4px;
-    }
-    .brand-sub {
-      font-size: 11px; letter-spacing: 5px; color: var(--copper);
-      text-transform: uppercase; text-align: center;
-      margin-bottom: 18px; opacity: 0.85;
-    }
-
-    .ornament {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 20px; width: 100%; max-width: 280px;
-    }
-    .ornament-line { flex: 1; height: 1px; background: linear-gradient(90deg,transparent,var(--copper),transparent); opacity: 0.6; }
-    .ornament-diamond { width: 7px; height: 7px; background: var(--gold); transform: rotate(45deg); flex-shrink: 0; box-shadow: 0 0 8px var(--glow); }
-
-    /* ── PLAYLIST ── */
-    .playlist {
-      width: 100%; max-width: 350px;
-      margin-bottom: 14px;
-      display: flex; flex-direction: column; gap: 7px;
-    }
-    .playlist-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 14px; border-radius: 12px;
-      background: rgba(184,115,51,0.07);
-      border: 1px solid rgba(184,115,51,0.18);
-      cursor: pointer;
-      transition: all 0.2s;
+    html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg); }
+    body {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      overscroll-behavior: none;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
-    .playlist-item:active { transform: scale(0.97); }
-    .playlist-item.active {
-      background: rgba(212,168,75,0.12);
-      border-color: rgba(212,168,75,0.4);
-      box-shadow: 0 0 14px rgba(212,168,75,0.1);
-    }
-    .pl-num {
-      font-size: 13px; color: var(--dim);
-      width: 18px; text-align: center; flex-shrink: 0;
-    }
-    .playlist-item.active .pl-num { color: var(--gold); }
-    .pl-info { flex: 1; min-width: 0; }
-    .pl-title {
-      font-size: 15px; font-style: italic; color: var(--cream);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .playlist-item.active .pl-title { color: var(--gold-lt); }
-    .pl-artist { font-size: 11px; letter-spacing: 1.5px; color: var(--dim); text-transform: uppercase; margin-top: 1px; }
-    .pl-icon { font-size: 16px; color: var(--dim); flex-shrink: 0; }
-    .playlist-item.active .pl-icon { color: var(--gold); }
 
-    /* barrita EQ animada para canción activa */
-    .eq-bars {
-      display: flex; align-items: flex-end; gap: 2px;
-      height: 16px; width: 14px; flex-shrink: 0;
+    /* ============================================================
+       SPLASH SCREEN
+    ============================================================ */
+    #splash {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 20px;
+      transition: opacity 0.5s ease;
     }
-    .eq-bar {
-      width: 3px; border-radius: 1px;
-      background: var(--gold);
-      animation: eqAnim var(--ed2,0.6s) ease-in-out infinite alternate;
+    #splash.hide { opacity: 0; pointer-events: none; }
+    .splash-logo { width: 96px; height: 96px; }
+    .splash-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px; letter-spacing: 4px;
+      color: var(--orange);
     }
-    .eq-bar:nth-child(2) { --ed2: 0.45s; }
-    .eq-bar:nth-child(3) { --ed2: 0.8s; }
-    @keyframes eqAnim {
-      from { height: 3px; }
-      to   { height: 14px; }
+    .splash-sub { font-size: 16px; color: var(--text-dim); letter-spacing: 2px; }
+    .splash-bar {
+      width: 160px; height: 3px;
+      background: var(--border); border-radius: 2px; overflow: hidden;
     }
-    .eq-bars.paused .eq-bar { animation-play-state: paused; }
+    .splash-bar-fill {
+      height: 100%; width: 0%; background: var(--orange);
+      border-radius: 2px;
+      animation: splashLoad 1.2s ease forwards;
+    }
+    @keyframes splashLoad { to { width: 100%; } }
 
-    /* ── CARD REPRODUCTOR ── */
-    .player-card {
-      width: 100%; max-width: 350px;
-      background: linear-gradient(158deg, rgba(22,10,2,0.97) 0%, rgba(10,4,0,0.99) 100%);
-      border: 1px solid rgba(184,115,51,0.35);
-      border-radius: 22px;
-      padding: 22px 20px 20px;
-      box-shadow:
-        0 0 0 1px rgba(212,168,75,0.06),
-        0 24px 70px rgba(0,0,0,0.75),
-        inset 0 1px 0 rgba(212,168,75,0.18),
-        inset 0 -1px 0 rgba(184,115,51,0.08);
+    /* ============================================================
+       HEADER
+    ============================================================ */
+    #header {
+      flex-shrink: 0;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      display: flex; align-items: center; gap: 10px;
+      position: relative; z-index: 100;
+    }
+    .header-logo { width: 32px; height: 32px; flex-shrink: 0; }
+    .header-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px; letter-spacing: 3px; color: var(--orange);
+      line-height: 1;
+    }
+    .header-sub { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-top: 1px; }
+    .header-spacer { flex: 1; }
+    .header-btn {
+      min-width: var(--tap); min-height: var(--tap);
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; cursor: pointer; font-size: 20px;
+      transition: background 0.15s, transform 0.1s;
+      user-select: none;
+    }
+    .header-btn:active { background: var(--border); transform: scale(0.93); }
+    .header-btn.rush-active { background: var(--red); border-color: var(--red); animation: rushPulse 1s infinite; }
+    @keyframes rushPulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+    /* ============================================================
+       BANNER OFFLINE / INSTALL
+    ============================================================ */
+    .banner {
+      flex-shrink: 0;
+      display: none; align-items: center; gap: 10px;
+      padding: 10px 14px; font-size: 14px; font-weight: 600;
+      background: var(--orange); color: #000;
+    }
+    .banner.show { display: flex; }
+    .banner-close {
+      margin-left: auto; cursor: pointer;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.2); border-radius: 50%;
+      font-size: 16px; flex-shrink: 0;
+    }
+    #offline-banner { background: var(--red); color: #fff; }
+
+    /* ============================================================
+       FILTROS DE ESTACIÓN
+    ============================================================ */
+    #station-bar {
+      flex-shrink: 0;
+      display: flex; gap: 6px; padding: 8px 10px;
+      overflow-x: auto; background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      scrollbar-width: none;
+    }
+    #station-bar::-webkit-scrollbar { display: none; }
+    .station-pill {
+      flex-shrink: 0;
+      padding: 0 14px; height: 36px;
+      border-radius: 18px; border: 1px solid var(--border);
+      background: var(--bg3); color: var(--text-dim);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: 1px;
+      cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+      user-select: none;
+    }
+    .station-pill.active {
+      background: var(--orange); border-color: var(--orange); color: #000;
+    }
+    .station-pill:active { transform: scale(0.94); }
+
+    /* ============================================================
+       GRID PRINCIPAL
+    ============================================================ */
+    #main {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding: 8px; display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px; align-content: start;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    #main::-webkit-scrollbar { width: 4px; }
+    #main::-webkit-scrollbar-track { background: transparent; }
+    #main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Estado vacío */
+    #empty-state {
+      grid-column: 1/-1;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 14px; padding: 60px 20px;
+      color: var(--text-dim); text-align: center;
+    }
+    #empty-state .es-icon { font-size: 64px; opacity: 0.3; }
+    #empty-state .es-title { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+    #empty-state .es-sub { font-size: 15px; line-height: 1.5; max-width: 260px; }
+
+    /* ============================================================
+       TARJETA DE TEMPORIZADOR
+    ============================================================ */
+    .timer-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 8px;
+      display: flex; flex-direction: column; gap: 7px;
       position: relative; overflow: hidden;
+      animation: cardIn 0.25s ease;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
-    .player-card::before {
-      content: '';
-      position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-lt), transparent);
-      opacity: 0.5;
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .player-card::after {
-      content: '';
-      position: absolute; inset: 0; border-radius: 22px;
-      background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(212,168,75,0.06), transparent 60%);
-      pointer-events: none;
-    }
+    .timer-card.state-yellow { border-color: var(--yellow); box-shadow: 0 0 14px rgba(255,204,0,0.15); }
+    .timer-card.state-red    { border-color: var(--red);    box-shadow: 0 0 18px rgba(255,32,32,0.25); }
+    .timer-card.state-done   { border-color: var(--red);    animation: cardBlink 0.6s ease infinite alternate; }
+    @keyframes cardBlink { from{box-shadow:0 0 10px rgba(255,32,32,0.3)} to{box-shadow:0 0 30px rgba(255,32,32,0.7)} }
+    .timer-card.rush-highlight { border-color: var(--orange); box-shadow: 0 0 20px rgba(255,107,0,0.3); }
 
-    /* logo mini + info */
-    .track-header {
-      display: flex; align-items: center; gap: 14px;
-      margin-bottom: 16px;
+    /* Indicador de estación (barra lateral) */
+    .station-indicator {
+      position: absolute; top: 0; left: 0; bottom: 0; width: 4px;
+      border-radius: var(--radius) 0 0 var(--radius);
     }
-    .player-logo-wrap { position: relative; flex-shrink: 0; }
-    .player-logo {
-      width: 60px; height: 60px; border-radius: 50%;
-      object-fit: cover;
-      box-shadow: 0 0 16px rgba(184,115,51,0.35), 0 0 0 2px rgba(212,168,75,0.18);
-    }
-    .vinyl-spin {
-      position: absolute; inset: -4px; border-radius: 50%;
-      border: 1.5px dashed rgba(212,168,75,0.22);
-      animation: ringRotate 4s linear infinite;
-    }
-    .vinyl-spin.paused { animation-play-state: paused; }
+    .si-Parrilla   { background: #ff4500; }
+    .si-Horno      { background: #ff8c00; }
+    .si-Freidora   { background: #ffd700; }
+    .si-Frío       { background: #00bfff; }
+    .si-Preparación{ background: #7cfc00; }
 
-    .track-meta { flex: 1; min-width: 0; }
-    .track-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 16px; font-style: italic;
-      color: var(--gold-lt); margin-bottom: 2px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    /* Header de tarjeta */
+    .card-head {
+      display: flex; align-items: center; gap: 5px; padding-left: 6px; flex-wrap: wrap;
     }
-    .track-artist {
-      font-size: 11px; letter-spacing: 2px;
-      color: var(--dim); text-transform: uppercase;
+    .card-station-badge {
+      font-size: 9px; font-weight: 900; letter-spacing: 1px;
+      padding: 2px 6px; border-radius: 4px;
+      text-transform: uppercase; flex-shrink: 0;
     }
-    .track-index {
-      font-size: 11px; color: var(--dim);
-      letter-spacing: 1px; margin-top: 3px;
-    }
+    .badge-Parrilla    { background:#ff4500; color:#fff; }
+    .badge-Horno       { background:#ff8c00; color:#000; }
+    .badge-Freidora    { background:#ffd700; color:#000; }
+    .badge-Frío        { background:#00bfff; color:#000; }
+    .badge-Preparación { background:#7cfc00; color:#000; }
 
-    /* waveform */
-    .waveform-wrap {
-      height: 40px; margin-bottom: 12px;
-      display: flex; align-items: center; gap: 2.5px;
-      justify-content: center; cursor: pointer;
+    .card-name {
+      flex: 1; font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+      background: transparent; border: none; color: var(--text);
+      font-family: 'Barlow Condensed', sans-serif;
+      outline: none; padding: 0; min-width: 0;
     }
-    .wave-bar { width: 3px; border-radius: 3px; background: rgba(184,115,51,0.22); }
-    .wave-bar.active { background: linear-gradient(to top, var(--ember), var(--gold)); animation: wavePulse var(--dur,0.7s) ease-in-out infinite alternate; }
-    .wave-bar.played { background: linear-gradient(to top, var(--rust), var(--copper)); opacity: 0.75; }
-    @keyframes wavePulse { from { transform: scaleY(0.3); } to { transform: scaleY(1); } }
+    .card-name:focus { border-bottom: 1px solid var(--orange); }
 
-    /* progreso */
-    .progress-wrap {
-      height: 5px; background: rgba(184,115,51,0.15);
-      border-radius: 3px; cursor: pointer;
-      position: relative; overflow: hidden; margin-bottom: 7px;
+    /* Pantalla de tiempo principal */
+    .card-display {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 4px 0;
+    }
+    .card-time {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px; line-height: 1;
+      letter-spacing: 1px;
+      transition: color 0.3s;
+      color: var(--green);
+    }
+    .card-time.yellow { color: var(--yellow); }
+    .card-time.red    { color: var(--red); animation: timeBlink 0.5s ease infinite alternate; }
+    @keyframes timeBlink { from{opacity:1} to{opacity:0.4} }
+
+    /* Barra de progreso lineal */
+    .progress-bar {
+      width: 100%; height: 6px; background: var(--border);
+      border-radius: 3px; overflow: hidden;
     }
     .progress-fill {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, var(--rust), var(--ember), var(--gold));
-      border-radius: 3px; transition: width 0.25s linear; pointer-events: none;
+      height: 100%; width: 100%;
+      background: var(--green);
+      border-radius: 3px;
+      transition: width 0.5s linear, background 0.3s;
+      transform-origin: left;
     }
-    .progress-thumb {
-      position: absolute; top: 50%; left: 0%;
-      width: 11px; height: 11px;
-      background: var(--gold-lt); border-radius: 50%;
-      transform: translate(-50%,-50%);
-      box-shadow: 0 0 8px var(--glow);
-      transition: left 0.25s linear; pointer-events: none;
+    .progress-fill.yellow { background: var(--yellow); }
+    .progress-fill.red    { background: var(--red); }
+
+    /* Editor de tiempo */
+    .time-editor {
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+    }
+    .time-input {
+      width: 38px; height: 34px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text);
+      font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+      text-align: center; outline: none;
+      -moz-appearance: textfield;
+    }
+    .time-input::-webkit-outer-spin-button,
+    .time-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .time-input:focus { border-color: var(--orange); }
+    .time-sep { font-size: 18px; font-weight: 900; color: var(--text-dim); padding-bottom: 2px; }
+
+    /* Botones de control */
+    .card-controls {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;
+    }
+    .card-controls-2 {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+    }
+    .btn {
+      min-height: 44px; border-radius: 8px; border: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+      cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 3px;
+      transition: transform 0.1s, opacity 0.15s;
+      user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active { transform: scale(0.91); }
+    .btn-start  { background: var(--green); color: #000; }
+    .btn-pause  { background: var(--yellow); color: #000; }
+    .btn-reset  { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+    .btn-dup    { background: var(--bg3); color: var(--orange); border: 1px solid var(--border); }
+    .btn-del    { background: #2a0a0a; color: var(--red); border: 1px solid #4a1010; }
+    .btn-icon   { font-size: 14px; }
+
+    /* ============================================================
+       MODO RUSH — PANEL SUPERIOR
+    ============================================================ */
+    #rush-panel {
+      display: none; flex-shrink: 0;
+      background: #1a0505; border-bottom: 2px solid var(--red);
+      padding: 8px 12px;
+    }
+    #rush-panel.show { display: block; }
+    .rush-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px; letter-spacing: 3px; color: var(--red);
+      margin-bottom: 6px;
+    }
+    .rush-list {
+      display: flex; gap: 8px; overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .rush-list::-webkit-scrollbar { display: none; }
+    .rush-item {
+      flex-shrink: 0; background: var(--bg3);
+      border: 1px solid var(--red); border-radius: 8px;
+      padding: 6px 12px; display: flex; flex-direction: column; align-items: center;
+      min-width: 90px;
+    }
+    .rush-name { font-size: 12px; color: var(--text-dim); letter-spacing: 1px; }
+    .rush-time { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--red); line-height: 1; }
+
+    /* ============================================================
+       BOTTOM BAR
+    ============================================================ */
+    #bottom-bar {
+      flex-shrink: 0;
+      background: var(--bg2); border-top: 1px solid var(--border);
+      padding: 8px 10px; padding-bottom: calc(8px + env(safe-area-inset-bottom));
+      display: flex; gap: 8px; align-items: center;
+    }
+    .bottom-btn {
+      flex: 1; min-height: 56px; border-radius: 10px; border: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: 1px;
+      cursor: pointer; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2px;
+      transition: transform 0.1s, background 0.15s;
+      background: var(--bg3); color: var(--text);
+      user-select: none;
+    }
+    .bottom-btn:active { transform: scale(0.92); }
+    .bottom-btn .bb-icon { font-size: 22px; }
+    .bottom-btn.primary { background: var(--orange); color: #000; }
+
+    /* ============================================================
+       MODAL DE PRESETS Y DIALOGS
+    ============================================================ */
+    .overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.8);
+      display: flex; align-items: flex-end;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .overlay.show { opacity: 1; pointer-events: all; }
+    .sheet {
+      width: 100%; background: var(--bg2);
+      border-radius: 18px 18px 0 0;
+      padding: 20px 16px; padding-bottom: calc(20px + env(safe-area-inset-bottom));
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      max-height: 80vh; overflow-y: auto;
+    }
+    .overlay.show .sheet { transform: translateY(0); }
+    .sheet-handle {
+      width: 40px; height: 4px; background: var(--border);
+      border-radius: 2px; margin: 0 auto 16px;
+    }
+    .sheet-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px; letter-spacing: 3px; color: var(--orange);
+      margin-bottom: 14px;
     }
 
-    .time-row {
-      display: flex; justify-content: space-between;
-      font-size: 12px; color: var(--dim);
-      letter-spacing: 1px; margin-bottom: 18px;
-      font-variant-numeric: tabular-nums;
+    /* Grid de presets */
+    .preset-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px; margin-bottom: 16px;
     }
-    #time-current { color: var(--copper); }
+    .preset-btn {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 10px;
+      cursor: pointer; text-align: left;
+      transition: border-color 0.15s, transform 0.1s;
+      user-select: none;
+    }
+    .preset-btn:active { transform: scale(0.94); border-color: var(--orange); }
+    .preset-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .preset-time { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--orange); }
+    .preset-station { font-size: 11px; color: var(--text-dim); margin-top: 2px; letter-spacing: 1px; }
 
-    /* controles */
-    .controls {
-      display: flex; align-items: center;
-      justify-content: center; gap: 14px; margin-bottom: 18px;
+    /* Selector de estación en sheet */
+    .station-select-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+      margin-bottom: 16px;
     }
-    .btn-aux {
-      width: 46px; height: 46px; border-radius: 50%;
-      background: rgba(184,115,51,0.08);
-      border: 1px solid rgba(184,115,51,0.22);
-      color: var(--copper); font-size: 17px; cursor: pointer;
+    .station-select-btn {
+      height: 48px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--bg3); color: var(--text);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: 1px;
+      cursor: pointer; transition: all 0.15s; display: flex;
+      align-items: center; justify-content: center; gap: 4px;
+      user-select: none;
+    }
+    .station-select-btn.sel { border-color: var(--orange); background: rgba(255,107,0,0.15); color: var(--orange); }
+    .station-select-btn:active { transform: scale(0.93); }
+
+    /* Historial */
+    .history-list { display: flex; flex-direction: column; gap: 6px; }
+    .history-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+      cursor: pointer; transition: border-color 0.15s, transform 0.1s;
+    }
+    .history-item:active { transform: scale(0.97); border-color: var(--orange); }
+    .history-name { flex: 1; font-size: 15px; font-weight: 700; }
+    .history-detail { font-size: 13px; color: var(--text-dim); }
+
+    /* Confirmación */
+    .confirm-overlay {
+      position: fixed; inset: 0; z-index: 600;
+      background: rgba(0,0,0,0.85);
       display: flex; align-items: center; justify-content: center;
-      transition: all 0.18s;
-      -webkit-tap-highlight-color: transparent; user-select: none;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      padding: 20px;
     }
-    .btn-aux:active { transform: scale(0.88); background: rgba(184,115,51,0.25); }
+    .confirm-overlay.show { opacity: 1; pointer-events: all; }
+    .confirm-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; width: 100%; max-width: 320px;
+      text-align: center;
+    }
+    .confirm-icon { font-size: 40px; margin-bottom: 12px; }
+    .confirm-msg { font-size: 18px; font-weight: 700; margin-bottom: 20px; line-height: 1.4; }
+    .confirm-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .confirm-cancel { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+    .confirm-ok { background: var(--red); color: #fff; border: none; }
 
-    .btn-play {
-      width: 66px; height: 66px; border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, var(--gold-lt), var(--gold), var(--copper));
-      border: none; color: var(--bg); font-size: 22px; cursor: pointer;
+    /* ============================================================
+       TOAST NOTIFICATIONS
+    ============================================================ */
+    #toast-container {
+      position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+      z-index: 800; display: flex; flex-direction: column;
+      align-items: center; gap: 6px; pointer-events: none; width: 100%;
+      padding: 0 16px;
+    }
+    .toast {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 16px;
+      font-size: 14px; font-weight: 600; letter-spacing: 0.5px;
+      opacity: 0; transform: translateY(-8px);
+      transition: opacity 0.2s, transform 0.2s;
+      max-width: 320px; text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-color: var(--green); color: var(--green); }
+    .toast.warn    { border-color: var(--yellow); color: var(--yellow); }
+    .toast.error   { border-color: var(--red); color: var(--red); }
+
+    /* ============================================================
+       BLOQUEO TÁCTIL
+    ============================================================ */
+    #lock-overlay {
+      position: fixed; inset: 0; z-index: 700;
+      background: rgba(10,10,10,0.92);
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+    }
+    #lock-overlay.show { display: flex; }
+    .lock-icon { font-size: 64px; }
+    .lock-msg { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--text-dim); }
+    .lock-hint { font-size: 14px; color: var(--text-dim); opacity: 0.6; }
+
+    /* ============================================================
+       MODO FULLSCREEN CENTER-COMMAND
+    ============================================================ */
+    #fs-btn { font-size: 20px; }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (min-width: 600px) {
+      #main { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
+      .btn { min-height: 48px; font-size: 13px; }
+      .btn-icon { font-size: 16px; }
+      .card-time { font-size: 54px; }
+    }
+    @media (min-width: 900px) {
+      #main { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); padding: 16px; gap: 14px; }
+      .card-time { font-size: 64px; }
+      .btn { min-height: var(--tap); font-size: 14px; }
+      .btn-icon { font-size: 20px; }
+    }
+
+    /* ============================================================
+       RECETARIO — estilos nuevos
+    ============================================================ */
+    .recipe-cat-tabs {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px;
+    }
+    .recipe-cat-tab {
+      padding: 5px 14px; border-radius: 16px; border: 1px solid var(--border);
+      background: var(--bg3); color: var(--text-dim);
+      font-size: 12px; font-weight: 700; letter-spacing: 1px;
+      cursor: pointer; transition: all 0.15s; user-select: none;
+    }
+    .recipe-cat-tab.active { background: var(--orange); border-color: var(--orange); color: #000; }
+    .recipe-cat-tab:active { transform: scale(0.93); }
+
+    .recipe-search {
+      width: 100%; height: 44px; background: var(--bg3);
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px; padding: 0 12px 0 38px; outline: none;
+      margin-bottom: 12px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 10px center;
+    }
+    .recipe-search:focus { border-color: var(--orange); }
+
+    .recipe-item {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 10px; margin-bottom: 8px; overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .recipe-item-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; cursor: pointer;
+    }
+    .recipe-item-head:active { background: rgba(255,107,0,0.05); }
+    .recipe-item-name { flex: 1; font-size: 16px; font-weight: 700; }
+    .recipe-item-price {
+      font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+      color: var(--orange); flex-shrink: 0;
+    }
+    .recipe-item-arrow { color: var(--text-dim); font-size: 14px; flex-shrink: 0; transition: transform 0.2s; }
+    .recipe-item.open .recipe-item-arrow { transform: rotate(90deg); }
+    .recipe-item-body {
+      display: none; padding: 0 14px 14px; border-top: 1px solid var(--border);
+    }
+    .recipe-item.open .recipe-item-body { display: block; }
+    .recipe-item-desc { font-size: 14px; color: var(--text-dim); line-height: 1.5; margin-bottom: 10px; padding-top: 10px; }
+    .recipe-item-cat { font-size: 11px; color: var(--text-dim); letter-spacing: 1.5px; margin-bottom: 8px; }
+
+    .recipe-timer-row {
+      display: flex; align-items: center; gap: 8px; margin-top: 8px;
+    }
+    .recipe-time-inp {
+      width: 46px; height: 36px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text); font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px; text-align: center; outline: none;
+      -moz-appearance: textfield;
+    }
+    .recipe-time-inp::-webkit-outer-spin-button,
+    .recipe-time-inp::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .recipe-time-inp:focus { border-color: var(--orange); }
+    .recipe-sep { font-weight: 900; color: var(--text-dim); }
+
+    .btn-recipe-launch {
+      flex: 1; height: 36px; background: var(--orange); color: #000;
+      border: none; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: 1px; cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .btn-recipe-launch:active { transform: scale(0.93); }
+
+    .btn-recipe-edit {
+      height: 36px; width: 36px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text-dim); cursor: pointer; font-size: 18px;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 0 6px rgba(212,168,75,0.12), 0 0 22px rgba(212,168,75,0.35), 0 4px 14px rgba(0,0,0,0.5);
-      transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent; user-select: none;
-      position: relative;
+      transition: transform 0.1s; flex-shrink: 0;
     }
-    .btn-play::before {
-      content: ''; position: absolute; inset: -4px; border-radius: 50%;
-      border: 1px solid rgba(212,168,75,0.3);
-      animation: pulsering 2s ease-out infinite; opacity: 0;
-    }
-    .btn-play.playing::before { opacity: 1; }
-    @keyframes pulsering { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.35); opacity: 0; } }
-    .btn-play:active { transform: scale(0.92); }
+    .btn-recipe-edit:active { transform: scale(0.93); }
 
-    /* volumen */
-    .volume-row { display: flex; align-items: center; gap: 10px; }
-    .vol-icon { font-size: 14px; color: var(--dim); flex-shrink: 0; }
-    .vol-slider {
-      flex: 1; -webkit-appearance: none; appearance: none;
-      height: 3px; border-radius: 2px;
-      background: rgba(184,115,51,0.2); cursor: pointer; outline: none;
+    /* Nuevo platillo en recetario */
+    .recipe-add-form {
+      background: var(--bg3); border: 1px solid var(--orange);
+      border-radius: 10px; padding: 14px; margin-bottom: 12px;
+      display: none;
     }
-    .vol-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 14px; height: 14px; border-radius: 50%;
-      background: radial-gradient(circle, var(--gold-lt), var(--gold));
-      box-shadow: 0 0 6px var(--glow); cursor: pointer;
+    .recipe-add-form.show { display: block; }
+    .recipe-inp {
+      width: 100%; height: 44px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px; padding: 0 12px; outline: none; margin-bottom: 8px;
+    }
+    .recipe-inp:focus { border-color: var(--orange); }
+    .recipe-inp-area {
+      width: 100%; min-height: 70px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px; padding: 10px 12px; outline: none; margin-bottom: 8px;
+      resize: vertical;
+    }
+    .recipe-inp-area:focus { border-color: var(--orange); }
+
+    /* ============================================================
+       AUDIO CUSTOM — estilos nuevos
+    ============================================================ */
+    .audio-zone {
+      border: 2px dashed var(--border); border-radius: 10px;
+      padding: 18px; text-align: center; cursor: pointer;
+      transition: border-color 0.2s; margin-bottom: 12px;
+    }
+    .audio-zone:hover, .audio-zone.drag-over { border-color: var(--orange); }
+    .audio-zone-icon { font-size: 32px; margin-bottom: 6px; }
+    .audio-zone-label { font-size: 14px; color: var(--text-dim); }
+
+    .audio-lib-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px; margin-bottom: 7px;
+    }
+    .audio-lib-name { flex: 1; font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .audio-lib-size { font-size: 12px; color: var(--text-dim); flex-shrink: 0; }
+    .btn-audio-play {
+      width: 36px; height: 36px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--green); cursor: pointer; font-size: 18px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: transform 0.1s;
+    }
+    .btn-audio-play:active { transform: scale(0.92); }
+    .btn-audio-del {
+      width: 36px; height: 36px; border-radius: 6px; border: 1px solid #4a1010;
+      background: #2a0a0a; color: var(--red); cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: transform 0.1s;
+    }
+    .btn-audio-del:active { transform: scale(0.92); }
+
+    /* ============================================================
+       EDIT TIMER SHEET
+    ============================================================ */
+    .edit-station-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;
     }
 
-    /* status */
-    .status-msg {
-      text-align: center; font-size: 12px;
-      letter-spacing: 1.5px; color: var(--dim);
-      margin-top: 13px; min-height: 17px;
-      font-style: italic; transition: color 0.3s;
+    /* ============================================================
+       SETTINGS
+    ============================================================ */
+    .settings-row {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px; margin-bottom: 8px;
     }
-    .status-msg.error { color: #d94f2a; }
-    .status-msg.ok    { color: var(--copper); }
-    .status-msg.play  { color: var(--gold); }
+    .settings-row-icon { font-size: 24px; flex-shrink: 0; }
+    .settings-row-info { flex: 1; }
+    .settings-row-label { font-size: 15px; font-weight: 700; }
+    .settings-row-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
 
-    .footer-note {
-      margin-top: 24px; font-size: 11px;
-      letter-spacing: 4px; color: rgba(184,115,51,0.4);
-      text-transform: uppercase; text-align: center;
+    /* Toggle switch */
+    .toggle-switch {
+      width: 48px; height: 26px; background: var(--border);
+      border-radius: 13px; position: relative; cursor: pointer;
+      transition: background 0.2s; flex-shrink: 0;
     }
+    .toggle-switch.on { background: var(--orange); }
+    .toggle-switch::after {
+      content: ''; position: absolute;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #fff; top: 3px; left: 3px;
+      transition: transform 0.2s;
+    }
+    .toggle-switch.on::after { transform: translateX(22px); }
+
+    .settings-inp {
+      width: 100%; height: 44px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px; padding: 0 12px; outline: none;
+    }
+    .settings-inp:focus { border-color: var(--orange); }
+
+    .settings-color-row {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+    }
+    .color-swatch {
+      width: 36px; height: 36px; border-radius: 8px; cursor: pointer;
+      border: 2px solid transparent; transition: transform 0.1s, border-color 0.15s;
+    }
+    .color-swatch.sel { border-color: #fff; transform: scale(1.1); }
+    .color-swatch:active { transform: scale(0.95); }
   </style>
 </head>
 <body>
 
-<div class="ember" style="left:15%;--delay:0s;  --ed:9s;  --dx:30px"></div>
-<div class="ember" style="left:30%;--delay:1.5s;--ed:11s; --dx:-20px"></div>
-<div class="ember" style="left:50%;--delay:0.7s;--ed:8s;  --dx:15px"></div>
-<div class="ember" style="left:65%;--delay:2.2s;--ed:10s; --dx:-35px"></div>
-<div class="ember" style="left:80%;--delay:3.1s;--ed:12s; --dx:25px"></div>
-<div class="ember" style="left:42%;--delay:4s;  --ed:9.5s;--dx:-10px"></div>
-
-<div class="scene">
-
-  <!-- Medallón -->
-  <div class="medallion-wrap">
-    <div class="medallion-outer"></div>
-    <div class="medallion-inner"></div>
-    <img class="logo-img"
-         src="logo_trapiche.png"
-         onerror="this.src='https://placehold.co/118x118/1a0800/d4a84b?text=TB'"
-         alt="Trapiche Bistro">
-  </div>
-
-  <h1 class="brand-title">Trapiche Bistro</h1>
-  <p class="brand-sub">Cocina Regional Sinaloense</p>
-
-  <div class="ornament">
-    <div class="ornament-line"></div>
-    <div class="ornament-diamond"></div>
-    <div class="ornament-line"></div>
-  </div>
-
-  <!-- Playlist -->
-  <div class="playlist" id="playlist"></div>
-
-  <!-- Reproductor -->
-  <div class="player-card">
-
-    <div class="track-header">
-      <div class="player-logo-wrap">
-        <img class="player-logo"
-             src="logo_trapiche.png"
-             onerror="this.src='https://placehold.co/60x60/1a0800/d4a84b?text=TB'"
-             alt="logo">
-        <div class="vinyl-spin paused" id="vinyl-ring"></div>
-      </div>
-      <div class="track-meta">
-        <div class="track-title"  id="track-title">—</div>
-        <div class="track-artist">Trapiche Bistro</div>
-        <div class="track-index"  id="track-index"></div>
-      </div>
-    </div>
-
-    <div class="waveform-wrap" id="waveform"></div>
-
-    <div class="progress-wrap" id="progress-wrap">
-      <div class="progress-fill"  id="progress-fill"></div>
-      <div class="progress-thumb" id="progress-thumb"></div>
-    </div>
-    <div class="time-row">
-      <span id="time-current">0:00</span>
-      <span id="time-total">0:00</span>
-    </div>
-
-    <div class="controls">
-      <button class="btn-aux" id="btn-prev"    title="Anterior">&#9198;</button>
-      <button class="btn-play" id="btn-play">&#9654;</button>
-      <button class="btn-aux" id="btn-next"    title="Siguiente">&#9197;</button>
-    </div>
-
-    <div class="volume-row">
-      <span class="vol-icon">&#128264;</span>
-      <input type="range" class="vol-slider" id="vol-slider" min="0" max="1" step="0.02" value="1">
-      <span class="vol-icon">&#128266;</span>
-    </div>
-
-    <div class="status-msg" id="status-msg">Selecciona una canción</div>
-  </div>
-
-  <p class="footer-note">Escanea &middot; Escucha &middot; Disfruta</p>
+<!-- ============================================================
+     SPLASH SCREEN
+============================================================ -->
+<div id="splash">
+  <svg class="splash-logo" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="96" height="96" rx="22" fill="#ff6b00"/>
+    <circle cx="48" cy="48" r="28" stroke="#000" stroke-width="4"/>
+    <line x1="48" y1="48" x2="48" y2="24" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+    <line x1="48" y1="48" x2="64" y2="56" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="48" cy="48" r="4" fill="#000"/>
+    <path d="M36 14 L48 8 L60 14" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <div class="splash-name">TRAPICHE</div>
+  <div class="splash-sub">TIMER · COCINA LEAN</div>
+  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
 </div>
 
-<audio id="audio-el" preload="auto"></audio>
+<!-- ============================================================
+     TOAST CONTAINER
+============================================================ -->
+<div id="toast-container"></div>
 
+<!-- ============================================================
+     BLOQUEO TÁCTIL
+============================================================ -->
+<div id="lock-overlay">
+  <div class="lock-icon">🔒</div>
+  <div class="lock-msg">PANTALLA BLOQUEADA</div>
+  <div class="lock-hint">Mantén presionado 2 segundos para desbloquear</div>
+</div>
+
+<!-- ============================================================
+     CONFIRMACIÓN
+============================================================ -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirm-icon">⚠️</div>
+    <div class="confirm-msg" id="confirm-msg">¿Confirmar acción?</div>
+    <div class="confirm-btns">
+      <button class="btn confirm-cancel" id="confirm-cancel">Cancelar</button>
+      <button class="btn confirm-ok" id="confirm-ok">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     HEADER
+============================================================ -->
+<div id="header">
+  <svg class="header-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="32" height="32" rx="7" fill="#ff6b00"/>
+    <circle cx="16" cy="16" r="9" stroke="#000" stroke-width="2"/>
+    <line x1="16" y1="16" x2="16" y2="8" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+    <line x1="16" y1="16" x2="21" y2="19" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="16" cy="16" r="1.5" fill="#000"/>
+  </svg>
+  <div>
+    <div class="header-title">TRAPICHE</div>
+    <div class="header-sub">TIMER · COCINA LEAN</div>
+  </div>
+  <div class="header-spacer"></div>
+  <!-- Indicador offline -->
+  <div id="offline-dot" style="display:none;width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0;" title="Sin conexión"></div>
+  <!-- Rush mode -->
+  <div class="header-btn" id="rush-btn" title="Modo RUSH" onclick="App.toggleRush()">🔥</div>
+  <!-- Lock -->
+  <div class="header-btn" id="lock-btn" title="Bloquear pantalla" onclick="App.toggleLock()">🔒</div>
+  <!-- Fullscreen -->
+  <div class="header-btn" id="fs-btn" title="Pantalla completa" onclick="App.toggleFullscreen()">⛶</div>
+</div>
+
+<!-- ============================================================
+     BANNERS
+============================================================ -->
+<div class="banner" id="install-banner">
+  📲 <span>Instala Trapiche Timer en tu dispositivo</span>
+  <button class="btn" onclick="App.installPWA()" style="padding:0 16px;min-height:36px;background:#000;color:var(--orange);border:none;border-radius:6px;font-size:13px;font-weight:700;letter-spacing:1px;">Instalar</button>
+  <div class="banner-close" onclick="document.getElementById('install-banner').classList.remove('show')">✕</div>
+</div>
+<div class="banner" id="offline-banner" style="display:none;">
+  📵 <span>Modo sin conexión — datos guardados localmente</span>
+</div>
+
+<!-- ============================================================
+     RUSH PANEL
+============================================================ -->
+<div id="rush-panel">
+  <div class="rush-title">⚡ RUSH — PRÓXIMOS A TERMINAR</div>
+  <div class="rush-list" id="rush-list"></div>
+</div>
+
+<!-- ============================================================
+     FILTROS DE ESTACIÓN
+============================================================ -->
+<div id="station-bar">
+  <div class="station-pill active" data-station="Todas" onclick="App.filterStation('Todas', this)">
+    🍽️ Todas
+  </div>
+  <div class="station-pill" data-station="Parrilla" onclick="App.filterStation('Parrilla', this)">
+    🔥 Parrilla
+  </div>
+  <div class="station-pill" data-station="Horno" onclick="App.filterStation('Horno', this)">
+    🍕 Horno
+  </div>
+  <div class="station-pill" data-station="Freidora" onclick="App.filterStation('Freidora', this)">
+    🫕 Freidora
+  </div>
+  <div class="station-pill" data-station="Frío" onclick="App.filterStation('Frío', this)">
+    ❄️ Frío
+  </div>
+  <div class="station-pill" data-station="Preparación" onclick="App.filterStation('Preparación', this)">
+    🥄 Prep.
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN GRID
+============================================================ -->
+<div id="main">
+  <div id="empty-state">
+    <div class="es-icon">⏱️</div>
+    <div class="es-title">SIN TEMPORIZADORES</div>
+    <div class="es-sub">Toca el botón <strong>+ NUEVO</strong> para crear tu primer temporizador o elige un preset rápido.</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     BOTTOM BAR
+============================================================ -->
+<div id="bottom-bar">
+  <button class="bottom-btn" onclick="App.openPresets()">
+    <span class="bb-icon">⚡</span>
+    <span>PRESETS</span>
+  </button>
+  <button class="bottom-btn primary" onclick="App.createTimer()">
+    <span class="bb-icon">＋</span>
+    <span>NUEVO</span>
+  </button>
+  <button class="bottom-btn" onclick="App.openRecetario()">
+    <span class="bb-icon">📖</span>
+    <span>RECETAS</span>
+  </button>
+  <button class="bottom-btn" onclick="App.openSettings()">
+    <span class="bb-icon">⚙️</span>
+    <span>CONFIG</span>
+  </button>
+</div>
+
+<!-- ============================================================
+     MODAL PRESETS
+============================================================ -->
+<div class="overlay" id="presets-overlay" onclick="UI.closeSheet('presets-overlay')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">⚡ PRESETS RÁPIDOS</div>
+    <div class="preset-grid" id="preset-grid">
+      <!-- generado por JS -->
+    </div>
+    <div class="sheet-title" style="font-size:20px;margin-top:8px;">➕ NUEVO TEMPORIZADOR</div>
+    <div style="margin-bottom:10px;">
+      <label style="font-size:13px;color:var(--text-dim);display:block;margin-bottom:6px;letter-spacing:1px;">ESTACIÓN</label>
+      <div class="station-select-grid" id="new-station-grid">
+        <!-- generado por JS -->
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="text" id="new-name" placeholder="Nombre del platillo"
+        style="flex:1;height:48px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:16px;padding:0 12px;outline:none;">
+      <div style="display:flex;align-items:center;gap:4px;">
+        <input type="number" id="new-h" value="0" min="0" max="9" class="time-input">
+        <span class="time-sep">:</span>
+        <input type="number" id="new-m" value="5" min="0" max="59" class="time-input">
+        <span class="time-sep">:</span>
+        <input type="number" id="new-s" value="0" min="0" max="59" class="time-input">
+      </div>
+    </div>
+    <button class="btn btn-start" style="width:100%;font-size:16px;" onclick="App.createTimerFromSheet()">
+      CREAR TEMPORIZADOR
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL RECETARIO
+============================================================ -->
+<div class="overlay" id="recetario-overlay" onclick="UI.closeSheet('recetario-overlay')">
+  <div class="sheet" onclick="event.stopPropagation()" style="max-height:92vh;">
+    <div class="sheet-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="sheet-title" style="margin-bottom:0;">📖 RECETARIO</div>
+      <button class="btn btn-start" style="min-height:38px;padding:0 14px;font-size:13px;" onclick="Recetario.toggleAddForm()">＋ AGREGAR</button>
+    </div>
+
+    <!-- Formulario de nuevo platillo -->
+    <div class="recipe-add-form" id="recipe-add-form">
+      <div style="font-size:13px;color:var(--orange);font-weight:700;letter-spacing:1px;margin-bottom:10px;">NUEVO PLATILLO</div>
+      <input class="recipe-inp" id="recipe-new-name" placeholder="Nombre del platillo" type="text">
+      <input class="recipe-inp" id="recipe-new-price" placeholder="Precio ej: $190" type="text">
+      <textarea class="recipe-inp-area" id="recipe-new-desc" placeholder="Descripción, ingredientes, notas..."></textarea>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:12px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px;">CATEGORÍA</div>
+        <div class="station-select-grid" id="recipe-cat-select"><!-- JS --></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+        <span style="font-size:13px;color:var(--text-dim);">Tiempo:</span>
+        <input type="number" class="recipe-time-inp" id="recipe-new-h" value="0" min="0" max="9">
+        <span class="recipe-sep">:</span>
+        <input type="number" class="recipe-time-inp" id="recipe-new-m" value="5" min="0" max="59">
+        <span class="recipe-sep">:</span>
+        <input type="number" class="recipe-time-inp" id="recipe-new-s" value="0" min="0" max="59">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button class="btn btn-reset" onclick="Recetario.toggleAddForm()">Cancelar</button>
+        <button class="btn btn-start" onclick="Recetario.saveNew()">Guardar</button>
+      </div>
+    </div>
+
+    <!-- Búsqueda -->
+    <input class="recipe-search" id="recipe-search" placeholder="Buscar platillo..." oninput="Recetario.render()">
+
+    <!-- Tabs de categoría -->
+    <div class="recipe-cat-tabs" id="recipe-cat-tabs"><!-- JS --></div>
+
+    <!-- Lista de platillos -->
+    <div id="recipe-list"><!-- JS --></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL AUDIO LIBRARY
+============================================================ -->
+<div class="overlay" id="audio-overlay" onclick="UI.closeSheet('audio-overlay')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">🎵 ALARMAS PERSONALIZADAS</div>
+    <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px;line-height:1.5;">
+      Carga archivos MP3 o M4A desde tu teléfono. Luego asígnalos a un temporizador al editarlo.
+    </p>
+
+    <!-- Zona de carga -->
+    <div class="audio-zone" id="audio-drop-zone" onclick="document.getElementById('audio-file-input').click()">
+      <div class="audio-zone-icon">📂</div>
+      <div class="audio-zone-label">Toca para seleccionar MP3 / M4A<br><span style="font-size:11px;opacity:0.6;">Máx. 5 MB por archivo</span></div>
+    </div>
+    <input type="file" id="audio-file-input" accept=".mp3,.m4a,audio/mpeg,audio/mp4,audio/x-m4a" multiple style="display:none" onchange="AudioLib.loadFiles(this.files)">
+
+    <!-- Lista de audios -->
+    <div id="audio-lib-list"><!-- JS --></div>
+    <!-- Elemento audio oculto para preview -->
+    <audio id="audio-preview" style="display:none"></audio>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL EDITAR TEMPORIZADOR
+============================================================ -->
+<div class="overlay" id="edit-timer-overlay" onclick="UI.closeSheet('edit-timer-overlay')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">✏️ EDITAR TEMPORIZADOR</div>
+    <input type="hidden" id="edit-timer-id">
+
+    <div style="margin-bottom:10px;">
+      <label style="font-size:12px;color:var(--text-dim);letter-spacing:1px;display:block;margin-bottom:5px;">NOMBRE</label>
+      <input type="text" id="edit-timer-name" class="recipe-inp" placeholder="Nombre del platillo">
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <label style="font-size:12px;color:var(--text-dim);letter-spacing:1px;display:block;margin-bottom:5px;">TIEMPO</label>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <input type="number" class="time-input" id="edit-h" min="0" max="9" value="0">
+        <span class="time-sep">:</span>
+        <input type="number" class="time-input" id="edit-m" min="0" max="59" value="5">
+        <span class="time-sep">:</span>
+        <input type="number" class="time-input" id="edit-s" min="0" max="59" value="0">
+      </div>
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <label style="font-size:12px;color:var(--text-dim);letter-spacing:1px;display:block;margin-bottom:5px;">ESTACIÓN</label>
+      <div class="edit-station-grid" id="edit-station-grid"><!-- JS --></div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px;color:var(--text-dim);letter-spacing:1px;display:block;margin-bottom:5px;">🎵 ALARMA PERSONALIZADA</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <select id="edit-audio-select" style="flex:1;height:44px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;padding:0 10px;outline:none;">
+          <option value="">— Alarma por defecto —</option>
+        </select>
+        <button class="btn-audio-play" id="edit-audio-preview-btn" onclick="AudioLib.previewSelected()" title="Escuchar">▶</button>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button class="btn btn-del" onclick="App.deleteTimerFromEdit()">🗑 ELIMINAR</button>
+      <button class="btn btn-start" onclick="App.saveTimerEdit()">💾 GUARDAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL CONFIGURACIÓN GENERAL
+============================================================ -->
+<div class="overlay" id="settings-overlay" onclick="UI.closeSheet('settings-overlay')">
+  <div class="sheet" onclick="event.stopPropagation()" style="max-height:90vh;">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">⚙️ CONFIGURACIÓN</div>
+
+    <!-- Nombre del restaurante -->
+    <div class="settings-row" style="flex-direction:column;align-items:flex-start;">
+      <div style="display:flex;align-items:center;gap:10px;width:100%;margin-bottom:8px;">
+        <span class="settings-row-icon">🏪</span>
+        <div class="settings-row-info">
+          <div class="settings-row-label">Nombre del restaurante</div>
+          <div class="settings-row-sub">Aparece en el header</div>
+        </div>
+      </div>
+      <input type="text" class="settings-inp" id="cfg-restaurant-name" placeholder="Ej: Trapiche" value="TRAPICHE">
+      <input type="text" class="settings-inp" id="cfg-restaurant-sub" placeholder="Subtítulo" value="TIMER · COCINA LEAN" style="margin-top:6px;">
+      <button class="btn btn-start" style="width:100%;margin-top:8px;min-height:40px;font-size:14px;" onclick="Settings.applyName()">Aplicar</button>
+    </div>
+
+    <!-- Acento de color -->
+    <div class="settings-row" style="flex-direction:column;align-items:flex-start;">
+      <div style="display:flex;align-items:center;gap:10px;width:100%;">
+        <span class="settings-row-icon">🎨</span>
+        <div class="settings-row-info">
+          <div class="settings-row-label">Color de acento</div>
+          <div class="settings-row-sub">Naranja por defecto</div>
+        </div>
+      </div>
+      <div class="settings-color-row" id="color-swatches"><!-- JS --></div>
+    </div>
+
+    <!-- Vibración -->
+    <div class="settings-row">
+      <span class="settings-row-icon">📳</span>
+      <div class="settings-row-info">
+        <div class="settings-row-label">Vibración</div>
+        <div class="settings-row-sub">Al terminar y advertencias</div>
+      </div>
+      <div class="toggle-switch" id="cfg-vibration" onclick="Settings.toggle('vibration', this)"></div>
+    </div>
+
+    <!-- Alarma sonora -->
+    <div class="settings-row">
+      <span class="settings-row-icon">🔔</span>
+      <div class="settings-row-info">
+        <div class="settings-row-label">Alarma sonora</div>
+        <div class="settings-row-sub">Beep al terminar</div>
+      </div>
+      <div class="toggle-switch" id="cfg-sound" onclick="Settings.toggle('sound', this)"></div>
+    </div>
+
+    <!-- Tamaño de fuente del timer -->
+    <div class="settings-row" style="flex-direction:column;align-items:flex-start;">
+      <div style="display:flex;align-items:center;gap:10px;width:100%;margin-bottom:10px;">
+        <span class="settings-row-icon">🔡</span>
+        <div class="settings-row-info">
+          <div class="settings-row-label">Tamaño del dígito</div>
+          <div class="settings-row-sub" id="font-size-label">64px</div>
+        </div>
+      </div>
+      <input type="range" id="cfg-font-size" min="48" max="96" step="4" value="64"
+        style="width:100%;accent-color:var(--orange);"
+        oninput="Settings.applyFontSize(this.value)">
+    </div>
+
+    <!-- Alarmas personalizadas -->
+    <div class="settings-row" style="cursor:pointer;" onclick="App.openAudioLib()">
+      <span class="settings-row-icon">🎵</span>
+      <div class="settings-row-info">
+        <div class="settings-row-label">Biblioteca de alarmas</div>
+        <div class="settings-row-sub">Cargar MP3 / M4A</div>
+      </div>
+      <div style="color:var(--orange);font-size:20px;">›</div>
+    </div>
+
+    <!-- Historial -->
+    <div class="settings-row" style="cursor:pointer;" onclick="UI.closeSheet('settings-overlay');App.openHistory();">
+      <span class="settings-row-icon">📋</span>
+      <div class="settings-row-info">
+        <div class="settings-row-label">Historial de tiempos</div>
+        <div class="settings-row-sub">Ver platillos completados</div>
+      </div>
+      <div style="color:var(--orange);font-size:20px;">›</div>
+    </div>
+
+    <!-- Exportar -->
+    <div class="settings-row" style="cursor:pointer;" onclick="App.exportData()">
+      <span class="settings-row-icon">💾</span>
+      <div class="settings-row-info">
+        <div class="settings-row-label">Exportar datos</div>
+        <div class="settings-row-sub">Backup JSON de todo</div>
+      </div>
+      <div style="color:var(--orange);font-size:20px;">›</div>
+    </div>
+
+    <!-- Limpiar todo -->
+    <div class="settings-row" style="cursor:pointer;border-color:#4a1010;" onclick="Settings.clearAll()">
+      <span class="settings-row-icon">🗑️</span>
+      <div class="settings-row-info">
+        <div class="settings-row-label" style="color:var(--red);">Borrar todos los datos</div>
+        <div class="settings-row-sub">Restaurar app al estado inicial</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;font-size:12px;color:var(--text-dim);margin-top:16px;letter-spacing:1px;">
+      TRAPICHE TIMER v2.0 · COCINA LEAN
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL HISTORIAL (conservado intacto)
+============================================================ -->
+<div class="overlay" id="history-overlay" onclick="UI.closeSheet('history-overlay')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">📋 HISTORIAL DE TIEMPOS</div>
+    <div class="history-list" id="history-list">
+      <!-- generado por JS -->
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SERVICE WORKER EMBEBIDO (template)
+============================================================ -->
+<script type="text/sw-template" id="sw-template">
+const CACHE_NAME = 'trapiche-v1';
+const STATIC_ASSETS = ['/'];
+
+// Instalación: pre-cache de assets críticos
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(STATIC_ASSETS).catch(() => {});
+    })
+  );
+  self.skipWaiting();
+});
+
+// Activación: limpieza de caches antiguas
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+
+// Fetch: Cache First para estáticos, Network First para APIs
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  // Network First para fuentes externas
+  if (url.hostname !== self.location.hostname) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+  // Cache First para todo lo local
+  event.respondWith(
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      return fetch(event.request).then(response => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      }).catch(() => cached);
+    })
+  );
+});
+</script>
+
+<!-- ============================================================
+     JAVASCRIPT PRINCIPAL
+============================================================ -->
 <script>
-  /* ══════════════════════════════════════
-     PLAYLIST — agrega canciones aquí
-  ══════════════════════════════════════ */
-  const TRACKS = [
-    { title: 'Fuego en la Cocina', file: 'fuego_en_la_cocina_v10.mp3' },
-    { title: 'El Sabor Llegó',     file: 'el_sabor_llego_v8.mp3'     },
-    // { title: 'Otra Canción', file: 'otra_cancion.mp3' },  ← agrega más así
-  ];
+'use strict';
 
-  /* ── Refs ── */
-  const audio       = document.getElementById('audio-el');
-  const btnPlay     = document.getElementById('btn-play');
-  const progWrap    = document.getElementById('progress-wrap');
-  const progFill    = document.getElementById('progress-fill');
-  const progThumb   = document.getElementById('progress-thumb');
-  const timeCur     = document.getElementById('time-current');
-  const timeTot     = document.getElementById('time-total');
-  const volSlide    = document.getElementById('vol-slider');
-  const statusEl    = document.getElementById('status-msg');
-  const waveEl      = document.getElementById('waveform');
-  const vinylRing   = document.getElementById('vinyl-ring');
-  const trackTitle  = document.getElementById('track-title');
-  const trackIndex  = document.getElementById('track-index');
-  const playlistEl  = document.getElementById('playlist');
+/* ============================================================
+   MÓDULO STORAGE — Persistencia total con localStorage
+============================================================ */
+const Storage = {
+  NS: 'trapiche:',
 
-  let currentIdx = 0;
-  let isPlaying  = false;
-
-  /* ── Waveform ── */
-  const bars = [];
-  const BAR_COUNT = 30;
-  const heights = Array.from({ length: BAR_COUNT }, () => 6 + Math.random() * 20);
-  for (let i = 0; i < BAR_COUNT; i++) {
-    const b = document.createElement('div');
-    b.className = 'wave-bar';
-    b.style.height = heights[i] + 'px';
-    b.style.setProperty('--dur', (0.45 + Math.random() * 0.75).toFixed(2) + 's');
-    b.style.animationDelay = (i * 0.04).toFixed(2) + 's';
-    waveEl.appendChild(b);
-    bars.push(b);
-  }
-  function updateWaveBars(pct) {
-    const pivot = Math.floor(pct * BAR_COUNT);
-    bars.forEach((b, i) => {
-      b.classList.remove('active', 'played');
-      if (i < pivot) b.classList.add('played');
-    });
-  }
-  function startWave() {
-    const pivot = Math.floor((audio.currentTime / (audio.duration || 1)) * BAR_COUNT);
-    bars.forEach((b, i) => { if (i >= pivot) b.classList.add('active'); });
-    vinylRing.classList.remove('paused');
-  }
-  function stopWave() {
-    bars.forEach(b => b.classList.remove('active'));
-    vinylRing.classList.add('paused');
-  }
-
-  /* ── Playlist UI ── */
-  function buildPlaylist() {
-    playlistEl.innerHTML = '';
-    TRACKS.forEach((t, i) => {
-      const item = document.createElement('div');
-      item.className = 'playlist-item' + (i === currentIdx ? ' active' : '');
-      item.innerHTML = `
-        <span class="pl-num">${i + 1}</span>
-        <div class="pl-info">
-          <div class="pl-title">${t.title}</div>
-          <div class="pl-artist">Trapiche Bistro</div>
-        </div>
-        <div class="eq-bars${i === currentIdx && isPlaying ? '' : ' paused'}" id="eq-${i}">
-          <div class="eq-bar" style="--ed2:.55s"></div>
-          <div class="eq-bar" style="--ed2:.4s"></div>
-          <div class="eq-bar" style="--ed2:.7s"></div>
-        </div>
-      `;
-      item.addEventListener('click', () => loadTrack(i, true));
-      playlistEl.appendChild(item);
-    });
-  }
-
-  function updatePlaylistActive() {
-    document.querySelectorAll('.playlist-item').forEach((el, i) => {
-      el.classList.toggle('active', i === currentIdx);
-      const eq = document.getElementById('eq-' + i);
-      if (eq) eq.classList.toggle('paused', !(i === currentIdx && isPlaying));
-    });
-  }
-
-  /* ── Cargar pista ── */
-  function loadTrack(idx, autoplay = false) {
-    currentIdx = idx;
-    const t = TRACKS[idx];
-    audio.src = t.file;
-    audio.load();
-    trackTitle.textContent = t.title;
-    trackIndex.textContent = `${idx + 1} de ${TRACKS.length}`;
-    progFill.style.width  = '0%';
-    progThumb.style.left  = '0%';
-    timeCur.textContent   = '0:00';
-    timeTot.textContent   = '0:00';
-    stopWave();
-    updateWaveBars(0);
-    setStatus('Cargando…');
-    updatePlaylistActive();
-    if (autoplay) {
-      audio.addEventListener('canplay', function onCanPlay() {
-        audio.removeEventListener('canplay', onCanPlay);
-        doPlay();
-      }, { once: true });
-    }
-  }
-
-  async function doPlay() {
+  get(key, fallback = null) {
     try {
-      await audio.play();
-      btnPlay.innerHTML = '&#9646;&#9646;';
-      btnPlay.classList.add('playing');
-      isPlaying = true;
-      startWave();
-      setStatus('Reproduciendo…', 'play');
-      updatePlaylistActive();
+      const raw = localStorage.getItem(this.NS + key);
+      return raw !== null ? JSON.parse(raw) : fallback;
+    } catch { return fallback; }
+  },
+
+  set(key, value) {
+    try {
+      localStorage.setItem(this.NS + key, JSON.stringify(value));
+      return true;
     } catch (e) {
-      setStatus('Toca para reproducir.', 'error');
+      console.warn('Storage.set error:', e);
+      return false;
     }
+  },
+
+  remove(key) {
+    try { localStorage.removeItem(this.NS + key); } catch {}
+  },
+
+  clear() {
+    try {
+      Object.keys(localStorage)
+        .filter(k => k.startsWith(this.NS))
+        .forEach(k => localStorage.removeItem(k));
+    } catch {}
+  },
+
+  // Exportar todos los datos de la app
+  exportAll() {
+    try {
+      const data = {};
+      Object.keys(localStorage)
+        .filter(k => k.startsWith(this.NS))
+        .forEach(k => { data[k.replace(this.NS, '')] = JSON.parse(localStorage.getItem(k)); });
+      return data;
+    } catch { return {}; }
   }
+};
 
-  function doPause() {
-    audio.pause();
-    btnPlay.innerHTML = '&#9654;';
-    btnPlay.classList.remove('playing');
-    isPlaying = false;
-    stopWave();
-    setStatus('Pausado');
-    updatePlaylistActive();
+/* ============================================================
+   MÓDULO UI — Helpers de interfaz
+============================================================ */
+const UI = {
+  // Mostrar toast
+  toast(msg, type = 'success', duration = 2500) {
+    const container = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    container.appendChild(el);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => el.classList.add('show'));
+    });
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => el.remove(), 250);
+    }, duration);
+  },
+
+  // Abrir sheet
+  openSheet(id) {
+    document.getElementById(id).classList.add('show');
+  },
+
+  // Cerrar sheet
+  closeSheet(id) {
+    document.getElementById(id).classList.remove('show');
+  },
+
+  // Confirmación modal
+  confirm(msg, icon = '⚠️', okLabel = 'Eliminar') {
+    return new Promise(resolve => {
+      const overlay = document.getElementById('confirm-overlay');
+      document.getElementById('confirm-msg').textContent = msg;
+      document.getElementById('confirm-icon').textContent = icon;
+      document.getElementById('confirm-ok').textContent = okLabel;
+      overlay.classList.add('show');
+
+      const ok = document.getElementById('confirm-ok');
+      const cancel = document.getElementById('confirm-cancel');
+
+      const cleanup = (result) => {
+        overlay.classList.remove('show');
+        ok.removeEventListener('click', onOk);
+        cancel.removeEventListener('click', onCancel);
+        resolve(result);
+      };
+
+      const onOk = () => cleanup(true);
+      const onCancel = () => cleanup(false);
+      ok.addEventListener('click', onOk);
+      cancel.addEventListener('click', onCancel);
+    });
+  },
+
+  // Vibrar dispositivo
+  vibrate(pattern = [100]) {
+    try {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+    } catch {}
+  },
+
+  // Formatear segundos a HH:MM:SS
+  formatTime(totalSecs) {
+    const h = Math.floor(totalSecs / 3600);
+    const m = Math.floor((totalSecs % 3600) / 60);
+    const s = totalSecs % 60;
+    return [
+      String(h).padStart(2, '0'),
+      String(m).padStart(2, '0'),
+      String(s).padStart(2, '0')
+    ].join(':');
+  },
+
+  // Parsear HH:MM:SS a segundos
+  parseTime(h, m, s) {
+    return (parseInt(h) || 0) * 3600 + (parseInt(m) || 0) * 60 + (parseInt(s) || 0);
   }
+};
 
-  /* ── Utilidades ── */
-  function fmt(s) {
-    if (!isFinite(s)) return '0:00';
-    return Math.floor(s / 60) + ':' + Math.floor(s % 60).toString().padStart(2, '0');
+/* ============================================================
+   MÓDULO AUDIO — Alarmas diferenciadas por estación
+============================================================ */
+const Audio = {
+  ctx: null,
+
+  getCtx() {
+    if (!this.ctx) {
+      try {
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch { return null; }
+    }
+    return this.ctx;
+  },
+
+  // Beep genérico
+  beep(freq = 880, duration = 0.3, volume = 0.8, type = 'square') {
+    const ctx = this.getCtx();
+    if (!ctx) return;
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(volume, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + duration);
+    } catch {}
+  },
+
+  // Alarma por estación
+  alarm(station) {
+    const ctx = this.getCtx();
+    if (!ctx) return;
+    UI.vibrate([200, 100, 200, 100, 400]);
+
+    const patterns = {
+      Parrilla:    () => { this.beep(440,0.2); setTimeout(()=>this.beep(660,0.3),250); setTimeout(()=>this.beep(880,0.5),550); },
+      Horno:       () => { for(let i=0;i<3;i++) setTimeout(()=>this.beep(660,0.25,'sawtooth'),i*350); },
+      Freidora:    () => { this.beep(1000,0.1); setTimeout(()=>this.beep(1200,0.1),150); setTimeout(()=>this.beep(1400,0.3),300); },
+      Frío:        () => { this.beep(300,0.5,'sine'); setTimeout(()=>this.beep(400,0.5,'sine'),600); },
+      Preparación: () => { for(let i=0;i<4;i++) setTimeout(()=>this.beep(770,0.15),i*200); },
+    };
+
+    const fn = patterns[station] || patterns.Preparación;
+    fn();
+  },
+
+  // Beep suave de advertencia (amarillo)
+  warn() {
+    this.beep(660, 0.2, 0.4, 'sine');
   }
-  function setStatus(msg, cls) {
-    statusEl.textContent = msg;
-    statusEl.className = 'status-msg' + (cls ? ' ' + cls : '');
-  }
+};
 
-  /* ── Eventos audio ── */
-  audio.addEventListener('loadedmetadata', () => { timeTot.textContent = fmt(audio.duration); });
-  audio.addEventListener('canplay',        () => { if (!isPlaying) setStatus('Listo para reproducir', 'ok'); });
-  audio.addEventListener('error',          () => setStatus('No se encontró el audio. Verifica el nombre del MP3.', 'error'));
-  audio.addEventListener('waiting',        () => setStatus('Cargando…'));
+/* ============================================================
+   MÓDULO APP — Lógica principal
+============================================================ */
+const App = {
+  timers: [],            // Array de objetos timer
+  filter: 'Todas',       // Filtro activo
+  rushMode: false,       // Modo RUSH activo
+  locked: false,         // Bloqueo táctil
+  deferredInstall: null, // Evento beforeinstallprompt
+  lockTimer: null,       // Timeout para desbloquear
+  selectedStation: 'Parrilla', // Para el formulario de nuevo timer
 
-  audio.addEventListener('timeupdate', () => {
-    if (!audio.duration) return;
-    const pct = audio.currentTime / audio.duration;
-    progFill.style.width = (pct * 100).toFixed(2) + '%';
-    progThumb.style.left = (pct * 100).toFixed(2) + '%';
-    timeCur.textContent  = fmt(audio.currentTime);
-    if (!isPlaying) updateWaveBars(pct);
-  });
+  // Estaciones disponibles
+  STATIONS: ['Parrilla', 'Horno', 'Freidora', 'Frío', 'Preparación'],
 
-  audio.addEventListener('ended', () => {
-    isPlaying = false;
-    stopWave();
-    updateWaveBars(1);
-    // avance automático a la siguiente canción
-    if (currentIdx < TRACKS.length - 1) {
-      loadTrack(currentIdx + 1, true);
+  // Emojis por estación
+  STATION_EMOJI: {
+    Parrilla: '🔥', Horno: '🍕', Freidora: '🫕', Frío: '❄️', Preparación: '🥄'
+  },
+
+  // Presets predefinidos
+  PRESETS: [
+    { name: 'Tortilla',          h:0, m:0,  s:30, station:'Horno' },
+    { name: 'Carne Término Medio',h:0, m:6,  s:0,  station:'Parrilla' },
+    { name: 'Pizza Margarita',   h:0, m:12, s:0,  station:'Horno' },
+    { name: 'Papas Fritas',      h:0, m:4,  s:0,  station:'Freidora' },
+    { name: 'Pollo a la Parrilla',h:0,m:14, s:0,  station:'Parrilla' },
+    { name: 'Caldo en Reposo',   h:0, m:3,  s:0,  station:'Preparación' },
+    { name: 'Refresco Helado',   h:0, m:5,  s:0,  station:'Frío' },
+    { name: 'Flautas Fritas',    h:0, m:3,  s:30, station:'Freidora' },
+    { name: 'Tinga de Pollo',    h:0, m:20, s:0,  station:'Preparación' },
+    { name: 'Costilla BBQ',      h:0, m:25, s:0,  station:'Parrilla' },
+  ],
+
+  // Inicializar la aplicación
+  init() {
+    this.loadTimers();
+    this.buildPresets();
+    this.buildStationSelect();
+    this.registerSW();
+    this.setupManifest();
+    this.setupInstallPrompt();
+    this.setupOfflineDetection();
+    this.setupLockGesture();
+    this.startLoop();
+
+    // Ocultar splash después de 1.4s
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hide');
+      setTimeout(() => document.getElementById('splash').remove(), 600);
+    }, 1400);
+  },
+
+  // ── TEMPORIZADORES ─────────────────────────────────────────
+
+  // Crear nuevo temporizador
+  createTimer(preset = null) {
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+    const now = preset || {
+      name: 'Nuevo platillo',
+      h: 0, m: 5, s: 0,
+      station: this.selectedStation
+    };
+    const totalSecs = UI.parseTime(now.h, now.m, now.s);
+    if (totalSecs <= 0) { UI.toast('Tiempo debe ser mayor a 0', 'warn'); return; }
+
+    const timer = {
+      id,
+      name: now.name || 'Nuevo platillo',
+      station: now.station || 'Preparación',
+      totalSecs,
+      remaining: totalSecs,
+      running: false,
+      done: false,
+      alarmFired: false,
+      warnFired: false,
+      lastTick: null,
+    };
+
+    this.timers.push(timer);
+    this.saveTimers();
+    this.renderAll();
+    UI.toast(`${timer.name} creado`, 'success');
+    UI.vibrate([50]);
+  },
+
+  // Duplicar temporizador
+  duplicateTimer(id) {
+    const t = this.timers.find(x => x.id === id);
+    if (!t) return;
+    this.createTimer({
+      name: t.name + ' (copia)',
+      h: Math.floor(t.totalSecs / 3600),
+      m: Math.floor((t.totalSecs % 3600) / 60),
+      s: t.totalSecs % 60,
+      station: t.station
+    });
+  },
+
+  // Eliminar temporizador
+  async deleteTimer(id) {
+    const t = this.timers.find(x => x.id === id);
+    if (!t) return;
+    const ok = await UI.confirm(`¿Eliminar "${t.name}"?`, '🗑️', 'Eliminar');
+    if (!ok) return;
+    this.timers = this.timers.filter(x => x.id !== id);
+    this.saveTimers();
+    this.renderAll();
+    UI.toast('Temporizador eliminado', 'warn');
+  },
+
+  // Iniciar temporizador
+  startTimer(id) {
+    const t = this.timers.find(x => x.id === id);
+    if (!t || t.done) return;
+    t.running = true;
+    t.lastTick = Date.now();
+    this.saveTimers();
+    this.updateCard(id);
+  },
+
+  // Pausar temporizador
+  pauseTimer(id) {
+    const t = this.timers.find(x => x.id === id);
+    if (!t) return;
+    t.running = false;
+    t.lastTick = null;
+    this.saveTimers();
+    this.updateCard(id);
+  },
+
+  // Reiniciar temporizador
+  resetTimer(id) {
+    const t = this.timers.find(x => x.id === id);
+    if (!t) return;
+    t.remaining = t.totalSecs;
+    t.running = false;
+    t.done = false;
+    t.alarmFired = false;
+    t.warnFired = false;
+    t.lastTick = null;
+    this.saveTimers();
+    this.updateCard(id);
+  },
+
+  // Actualizar nombre de timer desde el input
+  updateName(id, name) {
+    const t = this.timers.find(x => x.id === id);
+    if (t) { t.name = name; this.saveTimers(); }
+  },
+
+  // Guardar timers en localStorage
+  saveTimers() {
+    Storage.set('timers', this.timers.map(t => ({
+      id: t.id, name: t.name, station: t.station,
+      totalSecs: t.totalSecs, remaining: t.remaining,
+      running: false, done: t.done,
+      alarmFired: t.alarmFired, warnFired: t.warnFired
+    })));
+  },
+
+  // Cargar timers desde localStorage
+  loadTimers() {
+    const saved = Storage.get('timers', []);
+    this.timers = saved.map(t => ({
+      ...t, running: false, lastTick: null
+    }));
+  },
+
+  // Guardar en historial
+  addToHistory(timer) {
+    const hist = Storage.get('history', []);
+    // Evitar solo duplicados dentro del mismo segundo (doble disparo)
+    const justAdded = hist.find(h =>
+      h.name === timer.name &&
+      h.station === timer.station &&
+      (Date.now() - new Date(h.usedAt).getTime()) < 3000
+    );
+    if (!justAdded) {
+      hist.unshift({
+        name: timer.name,
+        station: timer.station,
+        totalSecs: timer.totalSecs,
+        usedAt: new Date().toISOString()
+      });
+      Storage.set('history', hist.slice(0, 50)); // max 50 entradas
+    }
+  },
+
+  // ── LOOP DE TICK ────────────────────────────────────────────
+  // NOTA: startLoop se define abajo (App.startLoop = function()) para respetar
+  // la configuración de sonido/vibración y el audio personalizado.
+  startLoop() { /* reemplazado por el parche al final del archivo */ },
+
+  // ── RENDERIZADO ─────────────────────────────────────────────
+
+  renderAll() {
+    const container = document.getElementById('main');
+    const emptyState = document.getElementById('empty-state');
+
+    // Filtrar timers
+    const visible = this.filter === 'Todas'
+      ? this.timers
+      : this.timers.filter(t => t.station === this.filter);
+
+    if (visible.length === 0) {
+      emptyState.style.display = 'flex';
+      // Eliminar tarjetas existentes
+      Array.from(container.querySelectorAll('.timer-card')).forEach(c => c.remove());
     } else {
-      btnPlay.innerHTML = '&#9654;';
-      btnPlay.classList.remove('playing');
-      setStatus('— Fin de la playlist —', 'ok');
-      progFill.style.width = '100%';
-      progThumb.style.left = '100%';
-      updatePlaylistActive();
+      emptyState.style.display = 'none';
+      // Eliminar tarjetas que ya no existen
+      Array.from(container.querySelectorAll('.timer-card')).forEach(c => {
+        if (!this.timers.find(t => t.id === c.dataset.id)) c.remove();
+      });
+      // Añadir o actualizar tarjetas
+      visible.forEach((t, idx) => {
+        let card = container.querySelector(`.timer-card[data-id="${t.id}"]`);
+        if (!card) {
+          card = this.buildCard(t);
+          container.insertBefore(card, emptyState);
+        }
+        this.updateCard(t.id);
+      });
     }
-  });
 
-  /* ── Controles ── */
-  btnPlay.addEventListener('click', async () => {
-    if (!audio.src || audio.src === window.location.href) { loadTrack(0, true); return; }
-    if (audio.paused) doPlay(); else doPause();
-  });
+    this.updateRushPanel();
+  },
 
-  document.getElementById('btn-prev').addEventListener('click', () => {
-    if (audio.currentTime > 3) { audio.currentTime = 0; return; }
-    const idx = (currentIdx - 1 + TRACKS.length) % TRACKS.length;
-    loadTrack(idx, isPlaying);
-  });
+  // Construir el DOM de una tarjeta
+  buildCard(t) {
+    const card = document.createElement('div');
+    card.className = 'timer-card';
+    card.dataset.id = t.id;
 
-  document.getElementById('btn-next').addEventListener('click', () => {
-    const idx = (currentIdx + 1) % TRACKS.length;
-    loadTrack(idx, isPlaying);
-  });
+    card.innerHTML = `
+      <div class="station-indicator si-${t.station.replace(/\s/g,'')}"></div>
 
-  progWrap.addEventListener('click', e => {
-    if (!audio.duration) return;
-    const r = progWrap.getBoundingClientRect();
-    audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
-  });
+      <div class="card-head">
+        <span class="card-station-badge badge-${t.station.replace(/\s/g,'')}">${this.STATION_EMOJI[t.station] || ''} ${t.station.toUpperCase()}</span>
+        <input class="card-name" type="text" value="${this.escHtml(t.name)}"
+          oninput="App.updateName('${t.id}', this.value)"
+          onblur="App.updateName('${t.id}', this.value)">
+      </div>
 
-  volSlide.addEventListener('input', () => { audio.volume = parseFloat(volSlide.value); });
+      <div class="card-display">
+        <div class="card-time" id="ct-${t.id}">00:00:00</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="pf-${t.id}"></div>
+        </div>
+      </div>
 
-  /* ── Inicializar ── */
-  buildPlaylist();
-  loadTrack(0, false);
+      <div class="time-editor" id="te-${t.id}">
+        <input type="number" class="time-input" id="th-${t.id}" min="0" max="9" value="0"
+          oninput="App.adjustTotal('${t.id}')">
+        <span class="time-sep">:</span>
+        <input type="number" class="time-input" id="tm-${t.id}" min="0" max="59" value="0"
+          oninput="App.adjustTotal('${t.id}')">
+        <span class="time-sep">:</span>
+        <input type="number" class="time-input" id="ts-${t.id}" min="0" max="59" value="0"
+          oninput="App.adjustTotal('${t.id}')">
+      </div>
+
+      <div class="card-controls">
+        <button class="btn btn-start" id="btn-start-${t.id}" onclick="App.startTimer('${t.id}')">
+          <span class="btn-icon">▶</span> INICIAR
+        </button>
+        <button class="btn btn-pause" onclick="App.pauseTimer('${t.id}')">
+          <span class="btn-icon">⏸</span> PAUSA
+        </button>
+        <button class="btn btn-reset" onclick="App.resetTimer('${t.id}')">
+          <span class="btn-icon">↺</span> RESET
+        </button>
+      </div>
+      <div class="card-controls-2">
+        <button class="btn btn-dup" onclick="App.duplicateTimer('${t.id}')">
+          <span class="btn-icon">⧉</span> DUPLICAR
+        </button>
+        <button class="btn btn-del" onclick="App.deleteTimer('${t.id}')">
+          <span class="btn-icon">🗑</span> ELIMINAR
+        </button>
+      </div>
+      <button class="btn btn-reset" style="width:100%;font-size:13px;" onclick="App.openEditTimer('${t.id}')">
+        ✏️ EDITAR ESTE TEMPORIZADOR
+      </button>
+    `;
+
+    // Actualizar campos de tiempo
+    const h = Math.floor(t.totalSecs / 3600);
+    const m = Math.floor((t.totalSecs % 3600) / 60);
+    const s = t.totalSecs % 60;
+    card.querySelector(`#th-${t.id}`).value = h;
+    card.querySelector(`#tm-${t.id}`).value = m;
+    card.querySelector(`#ts-${t.id}`).value = s;
+
+    return card;
+  },
+
+  // Actualizar solo los elementos dinámicos de una tarjeta
+  updateCard(id) {
+    const t = this.timers.find(x => x.id === id);
+    const card = document.querySelector(`.timer-card[data-id="${id}"]`);
+    if (!t || !card) return;
+
+    const timeEl = card.querySelector(`#ct-${id}`);
+    const progEl = card.querySelector(`#pf-${id}`);
+    if (!timeEl || !progEl) return;
+
+    // Tiempo mostrado
+    timeEl.textContent = UI.formatTime(t.remaining);
+
+    // Porcentaje
+    const pct = t.totalSecs > 0 ? t.remaining / t.totalSecs : 0;
+    progEl.style.width = `${Math.round(pct * 100)}%`;
+
+    // Estado de color
+    let state = 'green';
+    if (t.done || t.remaining === 0) state = 'done';
+    else if (pct <= 0.20) state = 'red';
+    else if (pct <= 0.40) state = 'yellow';
+
+    // Limpiar clases de estado
+    timeEl.className = 'card-time';
+    progEl.className = 'progress-fill';
+    card.className = 'timer-card';
+
+    if (state === 'done') {
+      timeEl.classList.add('red');
+      progEl.classList.add('red');
+      card.classList.add('state-done');
+    } else if (state === 'red') {
+      timeEl.classList.add('red');
+      progEl.classList.add('red');
+      card.classList.add('state-red');
+    } else if (state === 'yellow') {
+      timeEl.classList.add('yellow');
+      progEl.classList.add('yellow');
+      card.classList.add('state-yellow');
+    }
+
+    // Rush highlight
+    if (this.rushMode) {
+      const topN = this.getRushTimers(3);
+      if (topN.find(x => x.id === id)) card.classList.add('rush-highlight');
+    }
+
+    // Ocultar editor de tiempo mientras corre
+    const editor = card.querySelector(`#te-${id}`);
+    if (editor) editor.style.display = t.running || t.done ? 'none' : 'flex';
+
+    // Botón start: cambiar apariencia si está corriendo
+    const startBtn = card.querySelector(`#btn-start-${id}`);
+    if (startBtn) {
+      if (t.running) {
+        startBtn.style.opacity = '0.4';
+        startBtn.style.pointerEvents = 'none';
+      } else {
+        startBtn.style.opacity = '1';
+        startBtn.style.pointerEvents = 'auto';
+      }
+    }
+  },
+
+  // Ajustar totalSecs desde el editor de la tarjeta
+  adjustTotal(id) {
+    const t = this.timers.find(x => x.id === id);
+    const card = document.querySelector(`.timer-card[data-id="${id}"]`);
+    if (!t || !card || t.running) return;
+    const h = card.querySelector(`#th-${id}`)?.value || 0;
+    const m = card.querySelector(`#tm-${id}`)?.value || 0;
+    const s = card.querySelector(`#ts-${id}`)?.value || 0;
+    const total = UI.parseTime(h, m, s);
+    if (total > 0) {
+      t.totalSecs = total;
+      t.remaining = total;
+      t.done = false;
+      t.alarmFired = false;
+      t.warnFired = false;
+      this.saveTimers();
+      this.updateCard(id);
+    }
+  },
+
+  // ── MODO RUSH ───────────────────────────────────────────────
+
+  getRushTimers(n = 3) {
+    return this.timers
+      .filter(t => t.running && !t.done && t.remaining > 0)
+      .sort((a, b) => a.remaining - b.remaining)
+      .slice(0, n);
+  },
+
+  toggleRush() {
+    this.rushMode = !this.rushMode;
+    const btn = document.getElementById('rush-btn');
+    const panel = document.getElementById('rush-panel');
+    btn.classList.toggle('rush-active', this.rushMode);
+    panel.classList.toggle('show', this.rushMode);
+    this.renderAll();
+    UI.toast(this.rushMode ? '🔥 MODO RUSH ACTIVADO' : 'MODO RUSH desactivado', this.rushMode ? 'error' : 'warn');
+  },
+
+  updateRushPanel() {
+    if (!this.rushMode) return;
+    const list = document.getElementById('rush-list');
+    const top = this.getRushTimers(3);
+    list.innerHTML = top.length
+      ? top.map(t => `
+          <div class="rush-item">
+            <div class="rush-name">${this.escHtml(t.name.substring(0,12))}</div>
+            <div class="rush-time">${UI.formatTime(t.remaining)}</div>
+          </div>
+        `).join('')
+      : '<div style="color:var(--text-dim);font-size:14px;padding:10px;">Sin timers activos</div>';
+  },
+
+  // ── FILTROS ─────────────────────────────────────────────────
+
+  filterStation(station, el) {
+    this.filter = station;
+    document.querySelectorAll('.station-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    this.renderAll();
+  },
+
+  // ── PRESETS ─────────────────────────────────────────────────
+
+  buildPresets() {
+    const grid = document.getElementById('preset-grid');
+    grid.innerHTML = this.PRESETS.map(p => `
+      <div class="preset-btn" onclick="App.usePreset(${this.escAttr(JSON.stringify(p))})">
+        <div class="preset-name">${this.escHtml(p.name)}</div>
+        <div class="preset-time">${String(p.h).padStart(2,'0')}:${String(p.m).padStart(2,'0')}:${String(p.s).padStart(2,'0')}</div>
+        <div class="preset-station">${this.STATION_EMOJI[p.station] || ''} ${p.station.toUpperCase()}</div>
+      </div>
+    `).join('');
+  },
+
+  usePreset(preset) {
+    this.createTimer(preset);
+    UI.closeSheet('presets-overlay');
+  },
+
+  openPresets() {
+    UI.openSheet('presets-overlay');
+  },
+
+  // Crear timer desde el formulario del sheet
+  createTimerFromSheet() {
+    const name = document.getElementById('new-name').value.trim() || 'Nuevo platillo';
+    const h = document.getElementById('new-h').value;
+    const m = document.getElementById('new-m').value;
+    const s = document.getElementById('new-s').value;
+    this.createTimer({ name, h, m, s, station: this.selectedStation });
+    UI.closeSheet('presets-overlay');
+  },
+
+  // Construir el selector de estación en el sheet
+  buildStationSelect() {
+    const grid = document.getElementById('new-station-grid');
+    grid.innerHTML = this.STATIONS.map(st => `
+      <button class="station-select-btn ${st === this.selectedStation ? 'sel' : ''}"
+        onclick="App.selectStation('${st}', this)">
+        ${this.STATION_EMOJI[st]} ${st}
+      </button>
+    `).join('');
+  },
+
+  selectStation(station, el) {
+    this.selectedStation = station;
+    document.querySelectorAll('.station-select-btn').forEach(b => b.classList.remove('sel'));
+    el.classList.add('sel');
+  },
+
+  // ── HISTORIAL ────────────────────────────────────────────────
+
+  openHistory() {
+    const hist = Storage.get('history', []);
+    const list = document.getElementById('history-list');
+
+    if (hist.length === 0) {
+      list.innerHTML = '<div style="color:var(--text-dim);text-align:center;padding:30px;font-size:16px;">Sin historial aún.<br>Completa un temporizador para registrarlo.</div>';
+    } else {
+      list.innerHTML = hist.map(h => {
+        const date = new Date(h.usedAt);
+        const dateStr = `${date.getDate()}/${date.getMonth()+1} ${date.getHours()}:${String(date.getMinutes()).padStart(2,'0')}`;
+        return `
+          <div class="history-item" onclick="App.useHistoryItem(${this.escAttr(JSON.stringify(h))})">
+            <div>
+              <div class="history-name">${this.STATION_EMOJI[h.station]||''} ${this.escHtml(h.name)}</div>
+              <div class="history-detail">${h.station.toUpperCase()} · ${UI.formatTime(h.totalSecs)}</div>
+            </div>
+            <div style="font-size:12px;color:var(--text-dim);flex-shrink:0;">${dateStr}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    UI.openSheet('history-overlay');
+  },
+
+  useHistoryItem(item) {
+    const h = Math.floor(item.totalSecs / 3600);
+    const m = Math.floor((item.totalSecs % 3600) / 60);
+    const s = item.totalSecs % 60;
+    this.createTimer({ name: item.name, h, m, s, station: item.station });
+    UI.closeSheet('history-overlay');
+  },
+
+  // ── BLOQUEO TÁCTIL ───────────────────────────────────────────
+
+  toggleLock() {
+    if (this.locked) {
+      this.unlock();
+    } else {
+      this.locked = true;
+      document.getElementById('lock-overlay').classList.add('show');
+      UI.toast('🔒 Pantalla bloqueada', 'warn');
+    }
+  },
+
+  unlock() {
+    this.locked = false;
+    document.getElementById('lock-overlay').classList.remove('show');
+    UI.toast('🔓 Desbloqueada', 'success');
+  },
+
+  setupLockGesture() {
+    const overlay = document.getElementById('lock-overlay');
+    let pressTimer = null;
+
+    const startPress = () => {
+      pressTimer = setTimeout(() => {
+        this.unlock();
+      }, 2000);
+    };
+    const endPress = () => {
+      clearTimeout(pressTimer);
+    };
+
+    overlay.addEventListener('touchstart', startPress, { passive: true });
+    overlay.addEventListener('touchend', endPress);
+    overlay.addEventListener('mousedown', startPress);
+    overlay.addEventListener('mouseup', endPress);
+  },
+
+  // ── PANTALLA COMPLETA ─────────────────────────────────────────
+
+  toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  },
+
+  // ── EXPORTAR DATOS ────────────────────────────────────────────
+
+  exportData() {
+    try {
+      const data = Storage.exportAll();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `trapiche-backup-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      UI.toast('💾 Datos exportados', 'success');
+    } catch (e) {
+      UI.toast('Error al exportar', 'error');
+    }
+  },
+
+  // ── SERVICE WORKER ────────────────────────────────────────────
+
+  registerSW() {
+    if (location.protocol === 'file:') return;
+    if (!('serviceWorker' in navigator)) return;
+
+    try {
+      const swCode = document.getElementById('sw-template').textContent;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+
+      navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(reg => {
+          console.log('[SW] Registrado:', reg.scope);
+        })
+        .catch(err => {
+          console.warn('[SW] Error de registro:', err);
+        });
+    } catch (e) {
+      console.warn('[SW] No se pudo registrar:', e);
+    }
+  },
+
+  // ── MANIFIESTO ────────────────────────────────────────────────
+
+  setupManifest() {
+    // Icono SVG en base64
+    const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#ff6b00"/><circle cx="96" cy="96" r="55" stroke="#000" stroke-width="8" fill="none"/><line x1="96" y1="96" x2="96" y2="48" stroke="#000" stroke-width="8" stroke-linecap="round"/><line x1="96" y1="96" x2="128" y2="112" stroke="#000" stroke-width="6" stroke-linecap="round"/><circle cx="96" cy="96" r="8" fill="#000"/><path d="M72 28 L96 16 L120 28" stroke="#000" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+    const b64 = btoa(unescape(encodeURIComponent(svgIcon)));
+    const iconDataUrl = `data:image/svg+xml;base64,${b64}`;
+
+    const manifest = {
+      name: "Trapiche Timer",
+      short_name: "Trapiche",
+      description: "Control de tiempos para cocina profesional Lean",
+      start_url: ".",
+      display: "standalone",
+      orientation: "portrait-primary",
+      theme_color: "#0a0a0a",
+      background_color: "#0a0a0a",
+      lang: "es",
+      categories: ["food", "productivity", "utilities"],
+      icons: [
+        { src: iconDataUrl, sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
+        { src: iconDataUrl, sizes: "256x256", type: "image/svg+xml", purpose: "any maskable" },
+        { src: iconDataUrl, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+      ]
+    };
+
+    const manifestStr = JSON.stringify(manifest);
+    const manifestBlob = new Blob([manifestStr], { type: 'application/json' });
+    const manifestUrl = URL.createObjectURL(manifestBlob);
+    document.getElementById('manifest-link').href = manifestUrl;
+  },
+
+  // ── INSTALL PROMPT ────────────────────────────────────────────
+
+  setupInstallPrompt() {
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      this.deferredInstall = e;
+      document.getElementById('install-banner').classList.add('show');
+    });
+    window.addEventListener('appinstalled', () => {
+      document.getElementById('install-banner').classList.remove('show');
+      UI.toast('✅ App instalada exitosamente', 'success');
+    });
+  },
+
+  installPWA() {
+    if (!this.deferredInstall) { UI.toast('Usa el menú del navegador para instalar', 'warn'); return; }
+    this.deferredInstall.prompt();
+    this.deferredInstall.userChoice.then(result => {
+      if (result.outcome === 'accepted') {
+        UI.toast('✅ Instalando Trapiche Timer...', 'success');
+      }
+      this.deferredInstall = null;
+    });
+  },
+
+  // ── OFFLINE DETECTION ─────────────────────────────────────────
+
+  setupOfflineDetection() {
+    const dot = document.getElementById('offline-dot');
+    const banner = document.getElementById('offline-banner');
+    const update = () => {
+      const offline = !navigator.onLine;
+      dot.style.display = offline ? 'block' : 'none';
+      banner.style.display = offline ? 'flex' : 'none';
+    };
+    window.addEventListener('online', update);
+    window.addEventListener('offline', update);
+    update();
+  },
+
+  // ── HELPERS ───────────────────────────────────────────────────
+
+  escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#039;');
+  },
+
+  escAttr(str) {
+    return String(str).replace(/'/g,'&apos;').replace(/"/g,'&quot;');
+  }
+};
+
+/* ============================================================
+   MÓDULO RECETARIO — Base de platillos del menú
+============================================================ */
+const Recetario = {
+  CATEGORIES: ['Todas','Desayunos','Entradas','Huevos','Omelettes','Chilaquiles',
+    'Combos','Típicos','Tortas','Ensaladas','Fajitas','Parrilla','Del Mar',
+    'Especialidades','Postres','Niños','Extras'],
+
+  STATION_MAP: {
+    'Desayunos':'Preparación','Entradas':'Preparación','Huevos':'Parrilla',
+    'Omelettes':'Parrilla','Chilaquiles':'Horno','Combos':'Preparación',
+    'Típicos':'Parrilla','Tortas':'Parrilla','Ensaladas':'Frío','Fajitas':'Parrilla',
+    'Parrilla':'Parrilla','Del Mar':'Frío','Especialidades':'Freidora',
+    'Postres':'Horno','Niños':'Horno','Extras':'Preparación'
+  },
+
+  activeCategory: 'Todas',
+  selectedCategoryNew: 'Desayunos',
+
+  // Datos del menú real cargados desde las imágenes
+  DEFAULT_RECIPES: [
+    // ENTRADAS / DESAYUNOS
+    {id:'r001',name:'Coctel de Frutas',category:'Entradas',price:'$108',desc:'Topping Cottage $20 · Topping Yogurt Natural $20',h:0,m:5,s:0},
+    {id:'r002',name:'Hot Cakes Tradicionales (3 pzas)',category:'Desayunos',price:'$108',desc:'',h:0,m:8,s:0},
+    {id:'r003',name:'Kekis (4 piezas)',category:'Desayunos',price:'$118',desc:'',h:0,m:6,s:0},
+    {id:'r004',name:'Pan Francés Brioche',category:'Desayunos',price:'$138',desc:'',h:0,m:5,s:0},
+    {id:'r005',name:'Molletes Especiales',category:'Desayunos',price:'$108',desc:'',h:0,m:8,s:0},
+    {id:'r006',name:'Tamal de Elote',category:'Desayunos',price:'$60',desc:'Frito o natural, con frijol y queso',h:0,m:4,s:0},
+    {id:'r007',name:'Tamal de Elote Gratinado',category:'Desayunos',price:'$65',desc:'Con frijol y queso',h:0,m:5,s:0},
+    {id:'r008',name:'Orden de Tamales (2 pzas)',category:'Desayunos',price:'$161',desc:'',h:0,m:6,s:0},
+    {id:'r009',name:'Orden de Tocino',category:'Entradas',price:'$78',desc:'',h:0,m:4,s:0},
+    {id:'r010',name:'Guacamole',category:'Entradas',price:'$88',desc:'',h:0,m:3,s:0},
+    {id:'r011',name:'Papas a la francesa o sazonadas',category:'Entradas',price:'$68',desc:'',h:0,m:4,s:0},
+    {id:'r012',name:'Gorditas con asiento y queso (3 pzas)',category:'Entradas',price:'$88',desc:'',h:0,m:5,s:0},
+    // HUEVOS AL GUSTO
+    {id:'r020',name:'Huevos Con Chorizo',category:'Huevos',price:'$153',desc:'2 piezas revueltos, acompañados con frijol y queso',h:0,m:8,s:0},
+    {id:'r021',name:'Huevos Con Jamón',category:'Huevos',price:'$153',desc:'2 piezas revueltos, acompañados con frijol y queso',h:0,m:7,s:0},
+    {id:'r022',name:'Huevos Rancheros',category:'Huevos',price:'$153',desc:'2 piezas, acompañados con frijol y queso',h:0,m:8,s:0},
+    {id:'r023',name:'Huevos Divorciados',category:'Huevos',price:'$153',desc:'2 piezas, acompañados con frijol y queso',h:0,m:8,s:0},
+    {id:'r024',name:'Huevos Con Machaca',category:'Huevos',price:'$153',desc:'2 piezas revueltos, acompañados con frijol y queso',h:0,m:8,s:0},
+    {id:'r025',name:'Huevos Con Chilorio',category:'Huevos',price:'$153',desc:'2 piezas revueltos, acompañados con frijol y queso',h:0,m:8,s:0},
+    // OMELETTES
+    {id:'r030',name:'Omelette Jamón con Queso',category:'Omelettes',price:'$153',desc:'2 piezas revueltos, acompañados con frijol y queso',h:0,m:6,s:0},
+    {id:'r031',name:'Omelette Saludable',category:'Omelettes',price:'$163',desc:'3 claras. Relleno de Jamón, Espinacas y Champiñón',h:0,m:7,s:0},
+    {id:'r032',name:'Omelette Español',category:'Omelettes',price:'$223',desc:'Relleno de Camarones Bañados en Salsa Española con topping de Parmesano',h:0,m:8,s:0},
+    {id:'r033',name:'Omelette Ranchero',category:'Omelettes',price:'$223',desc:'Relleno de Queso Bañado con Guiso Especial de Camarones Rancheros',h:0,m:9,s:0},
+    {id:'r034',name:'Omelette Fiesta',category:'Omelettes',price:'$173',desc:'Relleno de Jamón y Queso bañado en Crema Suiza, Poblana o Chipotle',h:0,m:8,s:0},
+    // CHILAQUILES
+    {id:'r040',name:'Chilaquiles Verdes / Rojos / Entomatados',category:'Chilaquiles',price:'$123',desc:'Con pollo, gratinados o con huevo: $153',h:0,m:10,s:0},
+    {id:'r041',name:'Chilaquiles Italianos',category:'Chilaquiles',price:'$163',desc:'Totopos en salsa napolitana y pechuga gratinada',h:0,m:10,s:0},
+    {id:'r042',name:'Chilaquiles Madre Patria',category:'Chilaquiles',price:'$163',desc:'Salsa de tomate y pimiento morrón asado, topping de huevos rotos fritos',h:0,m:10,s:0},
+    {id:'r043',name:'Chilaquiles Chipocludos',category:'Chilaquiles',price:'$163',desc:'Crema de chile chipotle y pollo a la plancha',h:0,m:10,s:0},
+    {id:'r044',name:'Birriaquiles',category:'Chilaquiles',price:'$165',desc:'',h:0,m:12,s:0},
+    // SALUDABLES
+    {id:'r050',name:'Baguette de Pollo',category:'Entradas',price:'$153',desc:'Acompañada de papas a la francesa',h:0,m:8,s:0},
+    {id:'r051',name:'Sandwich Especial',category:'Entradas',price:'$183',desc:'Relleno de huevo, jamón, queso y chilorio. Acompañado de papas a la francesa',h:0,m:8,s:0},
+    // PLATILLOS TÍPICOS
+    {id:'r060',name:'Bisteck Especial de Cabrería de Res',category:'Típicos',price:'$225',desc:'Servido a la mexicana, acompañado de frijoles y chilaquiles',h:0,m:10,s:0},
+    {id:'r061',name:'Machaca de Res (100 grs oreada)',category:'Típicos',price:'$203',desc:'Al gusto, acompañado de frijoles y chilaquiles',h:0,m:10,s:0},
+    {id:'r062',name:'Lengua',category:'Típicos',price:'$230',desc:'En salsa verde, roja, en tres salsas o a la mexicana. Acompañada de frijoles y queso',h:0,m:15,s:0},
+    {id:'r063',name:'Hígado Encebollado o a la Mexicana',category:'Típicos',price:'$175',desc:'160 grs. Cocinado en cebolla blanca o a la mexicana. Guarnición de frijoles y chilaquiles',h:0,m:10,s:0},
+    {id:'r064',name:'Chicharrones a la Mexicana (120 grs)',category:'Típicos',price:'$183',desc:'Acompañados de chilaquiles, frijoles y queso',h:0,m:8,s:0},
+    {id:'r065',name:'Chilorio de Puerco al Gusto (160 grs)',category:'Típicos',price:'$183',desc:'Papas, sopitas, cebolla o natural. Acompañado de chilaquiles, frijoles y queso',h:0,m:10,s:0},
+    {id:'r066',name:'Sopitas a la mexicana (Sopitas Arturo)',category:'Típicos',price:'$163',desc:'Con rajas, gratinados y acompañados con frijol y queso',h:0,m:12,s:0},
+    {id:'r067',name:'El gringo (Favorito de mi hija)',category:'Típicos',price:'$210',desc:'Tres hot cakes con tocino, aderezados con miel de maple, acompañados con huevos al gusto y papas hashbrown',h:0,m:10,s:0},
+    // COMBOS
+    {id:'r070',name:'Desde Navolato Vengo',category:'Combos',price:'$193',desc:'Chilorio, chilaquiles rojos, frijoles y dos huevos al gusto (80 grs proteína)',h:0,m:12,s:0},
+    {id:'r071',name:'Sonora Querida',category:'Combos',price:'$203',desc:'Chilaquiles entomatados y gratinados, machaca de res, frijoles y dos huevos al gusto (50 grs proteína)',h:0,m:12,s:0},
+    {id:'r072',name:'Paso del Norte',category:'Combos',price:'$203',desc:'Chilaquiles verdes, arrachera a la plancha, frijoles y dos huevos al gusto (100 grs proteína)',h:0,m:14,s:0},
+    {id:'r073',name:'El Barzón',category:'Combos',price:'$193',desc:'Chilaquiles verdes con pollo, tamal de elote natural o frito, frijoles y dos huevos al gusto',h:0,m:12,s:0},
+    {id:'r074',name:'Cuatro Milpas (Vegetariano)',category:'Combos',price:'$193',desc:'Chilaquiles verdes o poblanos, colache sinaloense, rajas con elote y frijol con queso fresco',h:0,m:12,s:0},
+    {id:'r075',name:'Mi Gusto Es',category:'Combos',price:'$218',desc:'Arma tu propio platillo con 4 porciones de la sección de combos (incluye una proteína)',h:0,m:12,s:0},
+    {id:'r076',name:'Caminos de Michoacán',category:'Combos',price:'$193',desc:'Carnitas de puerco con cebolla curtida, chilaquiles verdes, frijoles y dos huevos al gusto (100 grs proteína)',h:0,m:14,s:0},
+    // PARRILLA
+    {id:'r080',name:'Costillas de Cabrería (500 grs)',category:'Parrilla',price:'$280',desc:'Asadas al grill, las tradicionales ricas y jugosas. Acompañadas de papas fritas y cebollas',h:0,m:25,s:0},
+    {id:'r081',name:'Short Rib 500 grs al horno',category:'Parrilla',price:'$300',desc:'Costillas braceadas al horno por largo tiempo, tiernas y en su jugo',h:0,m:45,s:0},
+    {id:'r082',name:'Cabrería Tradicional Sinaloense (350 grs)',category:'Parrilla',price:'$480',desc:'Una tradición sinaloense. Acompañada de papas fritas y cebollas',h:0,m:20,s:0},
+    {id:'r083',name:'Ribeye (350 grs)',category:'Parrilla',price:'$510',desc:'En su punto! Acompañado de papas fritas y cebollas',h:0,m:12,s:0},
+    {id:'r084',name:'Arrachera (300 grs)',category:'Parrilla',price:'$370',desc:'Acompañada de papas fritas y cebollas',h:0,m:8,s:0},
+    // PECHUGAS DE POLLO
+    {id:'r090',name:'Pechuga en salsa Suiza',category:'Parrilla',price:'$190',desc:'Acompañada de arroz a la mantequilla y ensalada de la casa',h:0,m:14,s:0},
+    {id:'r091',name:'Pechuga al chipotle',category:'Parrilla',price:'$190',desc:'Acompañada de arroz a la mantequilla y ensalada de la casa',h:0,m:14,s:0},
+    {id:'r092',name:'Pechuga a la plancha',category:'Parrilla',price:'$190',desc:'Acompañada de arroz a la mantequilla y ensalada de la casa',h:0,m:12,s:0},
+    {id:'r093',name:'Pollo Frito Estilo Sinaloa',category:'Parrilla',price:'$255',desc:'Acompañada de ensalada fresca y papas fritas. ¡Una delicia!',h:0,m:18,s:0},
+    // DEL MAR
+    {id:'r100',name:'Tostada Panguera Tradicional',category:'Del Mar',price:'$120',desc:'Camarón, tomate, cebolla, pepino y serrano. ¡Con el sabor sinaloense!',h:0,m:5,s:0},
+    {id:'r101',name:'Tostada Macha',category:'Del Mar',price:'$150',desc:'Combinación de mariscos aderezados con una salsa macha del chef',h:0,m:6,s:0},
+    {id:'r102',name:'Rico Atún Fresco',category:'Del Mar',price:'$150',desc:'Con salsas negras, mango, cebolla y algo más',h:0,m:5,s:0},
+    {id:'r103',name:'Camarones Roca',category:'Del Mar',price:'$210',desc:'¡Con el tradicional aderezo spicy!',h:0,m:10,s:0},
+    // ENSALADAS
+    {id:'r110',name:'Ensalada César',category:'Ensaladas',price:'$148',desc:'Con lechuga orejona, parmesano, crotones y pechuga a la plancha, acompañada de aderezo cesar',h:0,m:8,s:0},
+    {id:'r111',name:'Ensalada Sinaloense',category:'Ensaladas',price:'$120',desc:'Fresco y delicioso tomate en rodajas finas, cebolla morada, sal, pimienta y limón',h:0,m:5,s:0},
+    {id:'r112',name:'Ensalada Mixta',category:'Ensaladas',price:'$120',desc:'La clásica lechuga, tomate y cebolla, acompañada de rico aderezo honey mustard',h:0,m:5,s:0},
+    // TORTAS
+    {id:'r120',name:'Pepito de Cabrería',category:'Tortas',price:'$193',desc:'Acompañada de papas a la francesa',h:0,m:10,s:0},
+    {id:'r121',name:'Torta de Cochinita',category:'Tortas',price:'$130',desc:'Acompañada de papas a la francesa',h:0,m:8,s:0},
+    {id:'r122',name:'Torta de Cabrería',category:'Tortas',price:'$193',desc:'Acompañada de papas a la francesa',h:0,m:10,s:0},
+    // FAJITAS
+    {id:'r130',name:'Fajitas de Pollo',category:'Fajitas',price:'$190',desc:'Acompañadas de ensalada de la casa',h:0,m:12,s:0},
+    {id:'r131',name:'Fajitas de Camarón',category:'Fajitas',price:'$210',desc:'Acompañadas de ensalada de la casa',h:0,m:10,s:0},
+    {id:'r132',name:'Fajitas de Res (Cabrería)',category:'Fajitas',price:'$210',desc:'Acompañadas de ensalada de la casa',h:0,m:14,s:0},
+    {id:'r133',name:'Fajitas Mixtas (Pollo y Res)',category:'Fajitas',price:'$210',desc:'Acompañadas de ensalada de la casa',h:0,m:14,s:0},
+    // ESPECIALIDADES
+    {id:'r140',name:'Tripitas Fritas (250 grs)',category:'Especialidades',price:'$220',desc:'Tripitas de leche cocidas y fritas sazonadas acompañadas de salsas. Guarnición de papas y cebolla cambray',h:0,m:15,s:0},
+    {id:'r141',name:'Tripitas Encebolladas (250 grs)',category:'Especialidades',price:'$220',desc:'Tripitas de leche al sartén. ¡Una delicia! Guarnición de papas y cebolla cambray',h:0,m:12,s:0},
+    {id:'r142',name:'Mollejas de Res (250 grs)',category:'Especialidades',price:'$250',desc:'Fritas o encebolladas, una especialidad del chef. Guarnición de papas y cebolla cambray',h:0,m:12,s:0},
+    {id:'r143',name:'Costillas de Cerdo (500 grs)',category:'Especialidades',price:'$260',desc:'Braseadas, las clásicas pero al estilo del chef. Acompañadas de papas fritas y elote dulce',h:0,m:30,s:0},
+    // POSTRES
+    {id:'r150',name:'Roles de canela Clásicos',category:'Postres',price:'$70',desc:'Crème Brûlée · Dulce de Leche · Frutos Rojos · Mantequilla de Maní · Nutella · Philadelphia',h:0,m:10,s:0},
+    {id:'r151',name:'Roles de canela Especiales',category:'Postres',price:'$80',desc:'Banana Foster · Maple con Tocino · Mazapán · Carlota de Limón',h:0,m:10,s:0},
+    {id:'r152',name:'Pan de elote',category:'Postres',price:'$70',desc:'Cremoso y esponjoso; ¡Único!',h:0,m:8,s:0},
+    // MENÚ NIÑOS
+    {id:'r160',name:'Salchipulpos',category:'Niños',price:'$143',desc:'Dos piezas de mini hotcakes, salchichas en forma de pulpitos y una pieza de huevo revuelto o estrellado. Incluye chocomilk, jugo o agua fresca',h:0,m:8,s:0},
+    {id:'r161',name:'El Terkito (burrito de harina)',category:'Niños',price:'$133',desc:'Con huevo, salchicha o jamón acompañado de papas gajos. Incluye chocomilk, jugo o agua fresca',h:0,m:8,s:0},
+    {id:'r162',name:'Mini Waffles',category:'Niños',price:'$143',desc:'Waffle, huevito revuelto, tira de tocino y papa hashbrown. Incluye chocomilk, jugo o agua fresca',h:0,m:8,s:0},
+    // ENCHILADAS
+    {id:'r170',name:'Enchiladas del Suelo',category:'Típicos',price:'$163',desc:'Rellenas de queso, pollo, chorizo o huevo',h:0,m:10,s:0},
+    {id:'r171',name:'Enchiladas Suizas',category:'Típicos',price:'$163',desc:'Rellenas de queso, pollo, chorizo o huevo',h:0,m:10,s:0},
+    {id:'r172',name:'Enmoladas',category:'Típicos',price:'$163',desc:'Rellenas de queso, pollo, chorizo o huevo',h:0,m:12,s:0},
+  ],
+
+  getRecipes() {
+    const saved = Storage.get('recipes', null);
+    if (saved) return saved;
+    Storage.set('recipes', this.DEFAULT_RECIPES);
+    return this.DEFAULT_RECIPES;
+  },
+
+  saveRecipes(recipes) {
+    Storage.set('recipes', recipes);
+  },
+
+  toggleAddForm() {
+    const form = document.getElementById('recipe-add-form');
+    form.classList.toggle('show');
+    if (form.classList.contains('show')) {
+      this.buildCatSelect();
+      document.getElementById('recipe-new-name').focus();
+    }
+  },
+
+  buildCatSelect() {
+    const grid = document.getElementById('recipe-cat-select');
+    if (!grid) return;
+    const cats = this.CATEGORIES.filter(c => c !== 'Todas');
+    grid.innerHTML = cats.map(c => `
+      <button class="station-select-btn ${c === this.selectedCategoryNew ? 'sel' : ''}"
+        onclick="Recetario.selectCatNew('${c}', this)" style="font-size:11px;">
+        ${c}
+      </button>
+    `).join('');
+  },
+
+  selectCatNew(cat, el) {
+    this.selectedCategoryNew = cat;
+    document.querySelectorAll('#recipe-cat-select .station-select-btn').forEach(b => b.classList.remove('sel'));
+    el.classList.add('sel');
+  },
+
+  saveNew() {
+    const name = document.getElementById('recipe-new-name').value.trim();
+    if (!name) { UI.toast('Ingresa un nombre', 'warn'); return; }
+    const price = document.getElementById('recipe-new-price').value.trim() || '';
+    const desc  = document.getElementById('recipe-new-desc').value.trim() || '';
+    const h = parseInt(document.getElementById('recipe-new-h').value) || 0;
+    const m = parseInt(document.getElementById('recipe-new-m').value) || 0;
+    const s = parseInt(document.getElementById('recipe-new-s').value) || 0;
+    const recipes = this.getRecipes();
+    const id = 'r' + Date.now().toString(36);
+    recipes.push({ id, name, category: this.selectedCategoryNew, price, desc, h, m, s });
+    this.saveRecipes(recipes);
+    // Limpiar form
+    document.getElementById('recipe-new-name').value = '';
+    document.getElementById('recipe-new-price').value = '';
+    document.getElementById('recipe-new-desc').value = '';
+    document.getElementById('recipe-add-form').classList.remove('show');
+    this.render();
+    UI.toast(`"${name}" agregado al recetario`, 'success');
+  },
+
+  buildCatTabs() {
+    const container = document.getElementById('recipe-cat-tabs');
+    if (!container) return;
+    const recipes = this.getRecipes();
+    const usedCats = [...new Set(recipes.map(r => r.category))];
+    const tabs = ['Todas', ...this.CATEGORIES.filter(c => c !== 'Todas' && usedCats.includes(c))];
+    container.innerHTML = tabs.map(c => `
+      <div class="recipe-cat-tab ${c === this.activeCategory ? 'active' : ''}"
+        onclick="Recetario.setCategory('${c}', this)">${c}</div>
+    `).join('');
+  },
+
+  setCategory(cat, el) {
+    this.activeCategory = cat;
+    document.querySelectorAll('.recipe-cat-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    this.render();
+  },
+
+  render() {
+    this.buildCatTabs();
+    const search = (document.getElementById('recipe-search')?.value || '').toLowerCase();
+    let recipes = this.getRecipes();
+    if (this.activeCategory !== 'Todas') recipes = recipes.filter(r => r.category === this.activeCategory);
+    if (search) recipes = recipes.filter(r => r.name.toLowerCase().includes(search) || r.desc.toLowerCase().includes(search));
+
+    const list = document.getElementById('recipe-list');
+    if (!list) return;
+    if (recipes.length === 0) {
+      list.innerHTML = '<div style="color:var(--text-dim);text-align:center;padding:30px;font-size:15px;">Sin platillos en esta categoría.</div>';
+      return;
+    }
+    list.innerHTML = recipes.map(r => `
+      <div class="recipe-item" id="ri-${r.id}">
+        <div class="recipe-item-head" onclick="Recetario.toggleItem('${r.id}')">
+          <div>
+            <div class="recipe-item-cat">${r.category.toUpperCase()}</div>
+            <div class="recipe-item-name">${App.escHtml(r.name)}</div>
+          </div>
+          <div class="recipe-item-price">${r.price || ''}</div>
+          <div class="recipe-item-arrow">›</div>
+        </div>
+        <div class="recipe-item-body">
+          ${r.desc ? `<div class="recipe-item-desc">${App.escHtml(r.desc)}</div>` : ''}
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:12px;color:var(--text-dim);">⏱ Tiempo:</span>
+            <input type="number" class="recipe-time-inp" id="rh-${r.id}" value="${r.h||0}" min="0" max="9">
+            <span class="recipe-sep">:</span>
+            <input type="number" class="recipe-time-inp" id="rm-${r.id}" value="${r.m||5}" min="0" max="59">
+            <span class="recipe-sep">:</span>
+            <input type="number" class="recipe-time-inp" id="rs-${r.id}" value="${r.s||0}" min="0" max="59">
+          </div>
+          <div class="recipe-timer-row" style="margin-top:10px;">
+            <button class="btn-recipe-launch" onclick="Recetario.launchTimer('${r.id}')">
+              ▶ CREAR TEMPORIZADOR
+            </button>
+            <button class="btn-recipe-edit" onclick="Recetario.editItem('${r.id}')" title="Editar platillo">✏️</button>
+            <button class="btn-recipe-edit" style="color:var(--red);border-color:#4a1010;background:#2a0a0a;" onclick="Recetario.deleteItem('${r.id}')" title="Eliminar platillo">🗑</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  toggleItem(id) {
+    const el = document.getElementById('ri-' + id);
+    if (el) el.classList.toggle('open');
+  },
+
+  launchTimer(id) {
+    const recipes = this.getRecipes();
+    const r = recipes.find(x => x.id === id);
+    if (!r) return;
+    const h = parseInt(document.getElementById('rh-' + id)?.value) || r.h || 0;
+    const m = parseInt(document.getElementById('rm-' + id)?.value) || r.m || 5;
+    const s = parseInt(document.getElementById('rs-' + id)?.value) || r.s || 0;
+    const station = this.STATION_MAP[r.category] || 'Preparación';
+    App.createTimer({ name: r.name, h, m, s, station });
+    UI.closeSheet('recetario-overlay');
+    UI.toast(`⏱ ${r.name} → Timer creado`, 'success');
+  },
+
+  async deleteItem(id) {
+    const ok = await UI.confirm('¿Eliminar este platillo del recetario?', '🗑️', 'Eliminar');
+    if (!ok) return;
+    const recipes = this.getRecipes().filter(r => r.id !== id);
+    this.saveRecipes(recipes);
+    this.render();
+    UI.toast('Platillo eliminado del recetario', 'warn');
+  },
+
+  editItem(id) {
+    const recipes = this.getRecipes();
+    const r = recipes.find(x => x.id === id);
+    if (!r) return;
+    // Reutilizamos el form de nuevo platillo para editar
+    const form = document.getElementById('recipe-add-form');
+    form.classList.add('show');
+    document.getElementById('recipe-new-name').value = r.name;
+    document.getElementById('recipe-new-price').value = r.price || '';
+    document.getElementById('recipe-new-desc').value = r.desc || '';
+    document.getElementById('recipe-new-h').value = r.h || 0;
+    document.getElementById('recipe-new-m').value = r.m || 5;
+    document.getElementById('recipe-new-s').value = r.s || 0;
+    this.buildCatSelect();
+    this.selectedCategoryNew = r.category;
+    this.buildCatSelect();
+    // Cambiar botón guardar para modo edición
+    const saveBtn = form.querySelector('button.btn-start');
+    saveBtn.textContent = 'Actualizar';
+    saveBtn.onclick = () => {
+      r.name     = document.getElementById('recipe-new-name').value.trim() || r.name;
+      r.price    = document.getElementById('recipe-new-price').value.trim();
+      r.desc     = document.getElementById('recipe-new-desc').value.trim();
+      r.h        = parseInt(document.getElementById('recipe-new-h').value) || 0;
+      r.m        = parseInt(document.getElementById('recipe-new-m').value) || 0;
+      r.s        = parseInt(document.getElementById('recipe-new-s').value) || 0;
+      r.category = this.selectedCategoryNew;
+      this.saveRecipes(recipes);
+      form.classList.remove('show');
+      saveBtn.textContent = 'Guardar';
+      saveBtn.onclick = () => Recetario.saveNew();
+      this.render();
+      UI.toast('Platillo actualizado', 'success');
+    };
+    document.getElementById('recipe-new-name').focus();
+  }
+};
+
+/* ============================================================
+   MÓDULO AUDIO LIBRARY — Alarmas personalizadas MP3/M4A
+============================================================ */
+const AudioLib = {
+  DB_KEY: 'audio_library',
+
+  getLib() { return Storage.get(this.DB_KEY, []); },
+  saveLib(lib) { Storage.set(this.DB_KEY, lib); },
+
+  async loadFiles(files) {
+    if (!files || files.length === 0) return;
+    const lib = this.getLib();
+    let added = 0;
+
+    for (const file of Array.from(files)) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (!['mp3','m4a'].includes(ext)) {
+        UI.toast(`${file.name}: solo MP3 / M4A`, 'warn'); continue;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        UI.toast(`${file.name}: máximo 5 MB`, 'warn'); continue;
+      }
+      // Leer como base64 para persistencia
+      try {
+        const b64 = await this.fileToBase64(file);
+        const id = 'aud_' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+        lib.push({ id, name: file.name, size: file.size, type: file.type, data: b64 });
+        added++;
+      } catch(e) {
+        UI.toast(`Error al leer ${file.name}`, 'error');
+      }
+    }
+
+    if (added > 0) {
+      this.saveLib(lib);
+      this.render();
+      UI.toast(`${added} alarma(s) cargada(s)`, 'success');
+    }
+  },
+
+  fileToBase64(file) {
+    return new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload = e => res(e.target.result);
+      reader.onerror = rej;
+      reader.readAsDataURL(file);
+    });
+  },
+
+  play(id) {
+    const lib = this.getLib();
+    const audio = lib.find(a => a.id === id);
+    if (!audio) return;
+    try {
+      const el = document.getElementById('audio-preview');
+      el.src = audio.data;
+      el.play().catch(() => {});
+    } catch {}
+  },
+
+  async delete(id) {
+    const ok = await UI.confirm('¿Eliminar este audio?', '🗑️', 'Eliminar');
+    if (!ok) return;
+    const lib = this.getLib().filter(a => a.id !== id);
+    this.saveLib(lib);
+    this.render();
+    UI.toast('Audio eliminado', 'warn');
+  },
+
+  render() {
+    const list = document.getElementById('audio-lib-list');
+    if (!list) return;
+    const lib = this.getLib();
+    if (lib.length === 0) {
+      list.innerHTML = '<div style="color:var(--text-dim);text-align:center;padding:20px;font-size:14px;">Sin alarmas personalizadas.<br>Carga un MP3 o M4A.</div>';
+    } else {
+      list.innerHTML = lib.map(a => `
+        <div class="audio-lib-item">
+          <div>
+            <div class="audio-lib-name">${App.escHtml(a.name)}</div>
+            <div class="audio-lib-size">${(a.size/1024).toFixed(0)} KB</div>
+          </div>
+          <button class="btn-audio-play" onclick="AudioLib.play('${a.id}')" title="Preview">▶</button>
+          <button class="btn-audio-del" onclick="AudioLib.delete('${a.id}')" title="Eliminar">🗑</button>
+        </div>
+      `).join('');
+    }
+    // Actualizar el select en el editor de timer
+    this.populateSelect();
+  },
+
+  populateSelect(selectEl = null) {
+    const sel = selectEl || document.getElementById('edit-audio-select');
+    if (!sel) return;
+    const lib = this.getLib();
+    const current = sel.value;
+    sel.innerHTML = '<option value="">— Alarma por defecto —</option>' +
+      lib.map(a => `<option value="${a.id}">${App.escHtml(a.name)}</option>`).join('');
+    if (current) sel.value = current;
+  },
+
+  previewSelected() {
+    const id = document.getElementById('edit-audio-select')?.value;
+    if (id) this.play(id);
+    else Audio.beep(660, 0.3, 0.5, 'sine');
+  },
+
+  // Disparar alarma personalizada si el timer tiene asignada una
+  triggerForTimer(timer) {
+    if (timer.customAudioId) {
+      const lib = this.getLib();
+      const aud = lib.find(a => a.id === timer.customAudioId);
+      if (aud) {
+        try {
+          const el = document.getElementById('audio-preview');
+          el.src = aud.data;
+          el.play().catch(() => {});
+          return;
+        } catch {}
+      }
+    }
+    // Fallback al audio procedural
+    Audio.alarm(timer.station);
+  }
+};
+
+/* ============================================================
+   MÓDULO SETTINGS
+============================================================ */
+const Settings = {
+  COLORS: [
+    { name:'Naranja', val:'#ff6b00' },
+    { name:'Rojo',    val:'#ff2020' },
+    { name:'Azul',    val:'#0ea5e9' },
+    { name:'Verde',   val:'#22c55e' },
+    { name:'Morado',  val:'#a855f7' },
+    { name:'Rosa',    val:'#ec4899' },
+    { name:'Amarillo',val:'#facc15' },
+    { name:'Cian',    val:'#06b6d4' },
+  ],
+
+  load() {
+    const cfg = Storage.get('settings', {
+      vibration: true, sound: true, fontSize: 64,
+      accentColor: '#ff6b00', restaurantName: 'TRAPICHE', restaurantSub: 'TIMER · COCINA LEAN'
+    });
+    // Aplicar configuraciones guardadas
+    this.applyAccent(cfg.accentColor || '#ff6b00', false);
+    this.applyFontSize(cfg.fontSize || 64, false);
+    document.getElementById('header').querySelector('.header-title').textContent = cfg.restaurantName || 'TRAPICHE';
+    document.getElementById('header').querySelector('.header-sub').textContent = cfg.restaurantSub || 'TIMER · COCINA LEAN';
+    return cfg;
+  },
+
+  getCfg() { return Storage.get('settings', { vibration:true, sound:true, fontSize:64, accentColor:'#ff6b00', restaurantName:'TRAPICHE', restaurantSub:'TIMER · COCINA LEAN' }); },
+  saveCfg(cfg) { Storage.set('settings', cfg); },
+
+  openPanel() {
+    const cfg = this.getCfg();
+    // Toggles
+    const vibToggle = document.getElementById('cfg-vibration');
+    const sndToggle = document.getElementById('cfg-sound');
+    if (vibToggle) vibToggle.classList.toggle('on', cfg.vibration !== false);
+    if (sndToggle) sndToggle.classList.toggle('on', cfg.sound !== false);
+    // Font size
+    const fsSlider = document.getElementById('cfg-font-size');
+    if (fsSlider) { fsSlider.value = cfg.fontSize || 64; }
+    document.getElementById('font-size-label').textContent = (cfg.fontSize || 64) + 'px';
+    // Nombre
+    document.getElementById('cfg-restaurant-name').value = cfg.restaurantName || 'TRAPICHE';
+    document.getElementById('cfg-restaurant-sub').value = cfg.restaurantSub || 'TIMER · COCINA LEAN';
+    // Color swatches
+    this.buildSwatches(cfg.accentColor || '#ff6b00');
+  },
+
+  buildSwatches(active) {
+    const container = document.getElementById('color-swatches');
+    if (!container) return;
+    container.innerHTML = this.COLORS.map(c => `
+      <div class="color-swatch ${c.val === active ? 'sel' : ''}"
+        style="background:${c.val};"
+        onclick="Settings.applyAccent('${c.val}', true, this)"
+        title="${c.name}"></div>
+    `).join('');
+  },
+
+  applyAccent(color, save = true, el = null) {
+    document.documentElement.style.setProperty('--orange', color);
+    // Ajustar orange-dim
+    document.documentElement.style.setProperty('--orange-dim', color);
+    if (el) {
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('sel'));
+      el.classList.add('sel');
+    }
+    if (save) {
+      const cfg = this.getCfg();
+      cfg.accentColor = color;
+      this.saveCfg(cfg);
+    }
+  },
+
+  applyFontSize(size, save = true) {
+    const px = parseInt(size);
+    document.querySelectorAll('.card-time').forEach(el => {
+      el.style.fontSize = px + 'px';
+    });
+    const label = document.getElementById('font-size-label');
+    if (label) label.textContent = px + 'px';
+    if (save) {
+      const cfg = this.getCfg();
+      cfg.fontSize = px;
+      this.saveCfg(cfg);
+      // También guardamos para que se aplique en nuevas tarjetas
+      document.documentElement.style.setProperty('--timer-font', px + 'px');
+    }
+  },
+
+  toggle(key, el) {
+    el.classList.toggle('on');
+    const cfg = this.getCfg();
+    cfg[key] = el.classList.contains('on');
+    this.saveCfg(cfg);
+  },
+
+  applyName() {
+    const name = document.getElementById('cfg-restaurant-name').value.trim() || 'TRAPICHE';
+    const sub  = document.getElementById('cfg-restaurant-sub').value.trim() || 'TIMER · COCINA LEAN';
+    document.getElementById('header').querySelector('.header-title').textContent = name;
+    document.getElementById('header').querySelector('.header-sub').textContent = sub;
+    const cfg = this.getCfg();
+    cfg.restaurantName = name;
+    cfg.restaurantSub = sub;
+    this.saveCfg(cfg);
+    UI.toast('Nombre actualizado', 'success');
+  },
+
+  async clearAll() {
+    const ok = await UI.confirm('¿Borrar TODOS los datos? Esto eliminará timers, historial, recetario personalizado y alarmas cargadas.', '☢️', 'Borrar todo');
+    if (!ok) return;
+    Storage.clear();
+    UI.toast('Datos borrados. Recargando...', 'warn');
+    setTimeout(() => location.reload(), 1200);
+  }
+};
+
+/* ============================================================
+   MÉTODOS NUEVOS DE App (Recetario, Audio, Edit, Settings)
+============================================================ */
+Object.assign(App, {
+
+  openRecetario() {
+    Recetario.render();
+    UI.openSheet('recetario-overlay');
+  },
+
+  openAudioLib() {
+    AudioLib.render();
+    UI.openSheet('audio-overlay');
+    const zone = document.getElementById('audio-drop-zone');
+    if (zone && !zone._dndSetup) {
+      zone._dndSetup = true;
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('drop', e => {
+        e.preventDefault(); zone.classList.remove('drag-over');
+        AudioLib.loadFiles(e.dataTransfer.files);
+      });
+    }
+  },
+
+  openSettings() {
+    Settings.openPanel();
+    UI.openSheet('settings-overlay');
+  },
+
+  openEditTimer(id) {
+    const t = this.timers.find(x => x.id === id);
+    if (!t) return;
+    document.getElementById('edit-timer-id').value = id;
+    document.getElementById('edit-timer-name').value = t.name;
+    document.getElementById('edit-h').value = Math.floor(t.totalSecs / 3600);
+    document.getElementById('edit-m').value = Math.floor((t.totalSecs % 3600) / 60);
+    document.getElementById('edit-s').value = t.totalSecs % 60;
+    const grid = document.getElementById('edit-station-grid');
+    grid.innerHTML = this.STATIONS.map(st => `
+      <button class="station-select-btn ${st === t.station ? 'sel' : ''}"
+        onclick="App.editSelectStation('${st}', this)" style="font-size:11px;">
+        ${this.STATION_EMOJI[st]} ${st}
+      </button>
+    `).join('');
+    AudioLib.populateSelect(document.getElementById('edit-audio-select'));
+    const sel = document.getElementById('edit-audio-select');
+    if (sel) sel.value = t.customAudioId || '';
+    UI.openSheet('edit-timer-overlay');
+  },
+
+  editSelectStation(station, el) {
+    document.querySelectorAll('#edit-station-grid .station-select-btn').forEach(b => b.classList.remove('sel'));
+    el.classList.add('sel');
+  },
+
+  saveTimerEdit() {
+    const id = document.getElementById('edit-timer-id').value;
+    const t = this.timers.find(x => x.id === id);
+    if (!t) return;
+    const name = document.getElementById('edit-timer-name').value.trim() || t.name;
+    const h = parseInt(document.getElementById('edit-h').value) || 0;
+    const m = parseInt(document.getElementById('edit-m').value) || 0;
+    const s = parseInt(document.getElementById('edit-s').value) || 0;
+    const total = UI.parseTime(h, m, s);
+    if (total <= 0) { UI.toast('Tiempo debe ser mayor a 0', 'warn'); return; }
+    const selStation = document.querySelector('#edit-station-grid .station-select-btn.sel');
+    const cleanStation = this.STATIONS.find(st => selStation?.textContent.includes(st)) || t.station;
+    const audioId = document.getElementById('edit-audio-select')?.value || '';
+    t.name = name;
+    t.station = cleanStation;
+    t.totalSecs = total;
+    if (!t.running) t.remaining = total;
+    t.customAudioId = audioId || null;
+    t.done = false; t.alarmFired = false; t.warnFired = false;
+    this.saveTimers();
+    const card = document.querySelector(`.timer-card[data-id="${id}"]`);
+    if (card) { const nc = this.buildCard(t); card.replaceWith(nc); }
+    this.updateCard(id);
+    UI.closeSheet('edit-timer-overlay');
+    UI.toast(`"${name}" actualizado`, 'success');
+  },
+
+  async deleteTimerFromEdit() {
+    const id = document.getElementById('edit-timer-id').value;
+    const t = this.timers.find(x => x.id === id);
+    if (!t) return;
+    const ok = await UI.confirm(`¿Eliminar "${t.name}"?`, '🗑️', 'Eliminar');
+    if (!ok) return;
+    this.timers = this.timers.filter(x => x.id !== id);
+    this.saveTimers();
+    UI.closeSheet('edit-timer-overlay');
+    this.renderAll();
+    UI.toast('Temporizador eliminado', 'warn');
+  }
+});
+
+// Patch startLoop — tick preciso: descuenta segundo a segundo sin drift
+App.startLoop = function() {
+  const tick = () => {
+    const now = Date.now();
+    let needSave = false;
+    this.timers.forEach(t => {
+      if (!t.running) return;
+      const elapsed = Math.floor((now - t.lastTick) / 1000);
+      if (elapsed <= 0) return;
+      // Avanzar lastTick exactamente los milisegundos correspondientes
+      // a los segundos completos contados — evita drift acumulativo
+      t.lastTick += elapsed * 1000;
+      t.remaining = Math.max(0, t.remaining - elapsed);
+      needSave = true;
+      const pct = t.remaining / t.totalSecs;
+      if (pct <= 0.20 && !t.warnFired && t.remaining > 0) {
+        t.warnFired = true;
+        const cfg = Settings.getCfg();
+        if (cfg.sound !== false) Audio.warn();
+        if (cfg.vibration !== false) UI.vibrate([80]);
+      }
+      if (t.remaining === 0 && !t.done) {
+        t.done = true; t.running = false; t.alarmFired = false;
+        this.addToHistory(t);
+      }
+      if (t.done && !t.alarmFired) {
+        t.alarmFired = true;
+        const cfg = Settings.getCfg();
+        if (cfg.sound !== false) AudioLib.triggerForTimer(t);
+        if (cfg.vibration !== false) UI.vibrate([200,100,200,100,400]);
+        UI.toast(`⏰ ${t.name} — ¡LISTO!`, 'error', 4000);
+      }
+      this.updateCard(t.id);
+    });
+    if (needSave) this.saveTimers();
+    this.updateRushPanel();
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+};
+
+/* ============================================================
+   INICIALIZACIÓN
+============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  App.init();
+  Settings.load();
+  App.renderAll();
+});
 </script>
 </body>
 </html>
