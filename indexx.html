@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0d0600">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Trapiche Bistro · Música</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:      #0a0400;
+      --copper:  #b87333;
+      --gold:    #d4a84b;
+      --gold-lt: #f0c96a;
+      --cream:   #f5e6c8;
+      --dim:     #6b4f2e;
+      --rust:    #7a2e0e;
+      --ember:   #c44a1a;
+      --glow:    rgba(212,168,75,0.3);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%; width: 100%;
+      background: var(--bg);
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 55% at 50% 0%,   rgba(184,115,51,0.14) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 50% at 15% 85%,  rgba(122,46,14,0.18)  0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 85% 70%,  rgba(196,74,26,0.10)  0%, transparent 55%),
+        repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(184,115,51,0.025) 3px, rgba(184,115,51,0.025) 6px);
+      pointer-events: none;
+    }
+
+    /* brasas */
+    .ember {
+      position: fixed; width: 3px; height: 3px; border-radius: 50%;
+      background: var(--gold-lt);
+      box-shadow: 0 0 6px var(--gold), 0 0 12px var(--ember);
+      pointer-events: none;
+      animation: floatEmber var(--ed,8s) ease-in var(--delay,0s) infinite;
+      opacity: 0;
+    }
+    @keyframes floatEmber {
+      0%   { transform: translate(0,0) scale(1);    opacity: 0; }
+      10%  { opacity: 0.9; }
+      80%  { opacity: 0.5; }
+      100% { transform: translate(var(--dx,20px),-160px) scale(0.2); opacity: 0; }
+    }
+
+    .scene {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 36px 20px 44px;
+      gap: 0;
+    }
+
+    /* medallón */
+    .medallion-wrap { position: relative; margin-bottom: 18px; }
+    .medallion-outer {
+      position: absolute; inset: -16px; border-radius: 50%;
+      border: 1.5px solid transparent;
+      background: conic-gradient(var(--gold),var(--copper),var(--rust),var(--ember),var(--gold)) border-box;
+      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out; mask-composite: exclude;
+      animation: ringRotate 10s linear infinite; opacity: 0.65;
+    }
+    .medallion-inner {
+      position: absolute; inset: -6px; border-radius: 50%;
+      border: 1px solid rgba(212,168,75,0.2);
+      animation: ringRotate 6s linear infinite reverse;
+    }
+    @keyframes ringRotate { to { transform: rotate(360deg); } }
+    .logo-img {
+      width: 118px; height: 118px; border-radius: 50%;
+      object-fit: cover; display: block;
+      box-shadow: 0 0 0 3px rgba(212,168,75,0.2), 0 0 40px rgba(184,115,51,0.18), 0 0 90px rgba(184,115,51,0.08);
+    }
+
+    .brand-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 34px; font-style: italic; font-weight: 400;
+      color: var(--gold); text-align: center;
+      text-shadow: 0 0 30px rgba(212,168,75,0.5), 0 2px 4px rgba(0,0,0,0.6);
+      margin-bottom: 4px;
+    }
+    .brand-sub {
+      font-size: 11px; letter-spacing: 5px; color: var(--copper);
+      text-transform: uppercase; text-align: center;
+      margin-bottom: 18px; opacity: 0.85;
+    }
+
+    .ornament {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 20px; width: 100%; max-width: 280px;
+    }
+    .ornament-line { flex: 1; height: 1px; background: linear-gradient(90deg,transparent,var(--copper),transparent); opacity: 0.6; }
+    .ornament-diamond { width: 7px; height: 7px; background: var(--gold); transform: rotate(45deg); flex-shrink: 0; box-shadow: 0 0 8px var(--glow); }
+
+    /* ── PLAYLIST ── */
+    .playlist {
+      width: 100%; max-width: 350px;
+      margin-bottom: 14px;
+      display: flex; flex-direction: column; gap: 7px;
+    }
+    .playlist-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px; border-radius: 12px;
+      background: rgba(184,115,51,0.07);
+      border: 1px solid rgba(184,115,51,0.18);
+      cursor: pointer;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .playlist-item:active { transform: scale(0.97); }
+    .playlist-item.active {
+      background: rgba(212,168,75,0.12);
+      border-color: rgba(212,168,75,0.4);
+      box-shadow: 0 0 14px rgba(212,168,75,0.1);
+    }
+    .pl-num {
+      font-size: 13px; color: var(--dim);
+      width: 18px; text-align: center; flex-shrink: 0;
+    }
+    .playlist-item.active .pl-num { color: var(--gold); }
+    .pl-info { flex: 1; min-width: 0; }
+    .pl-title {
+      font-size: 15px; font-style: italic; color: var(--cream);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .playlist-item.active .pl-title { color: var(--gold-lt); }
+    .pl-artist { font-size: 11px; letter-spacing: 1.5px; color: var(--dim); text-transform: uppercase; margin-top: 1px; }
+    .pl-icon { font-size: 16px; color: var(--dim); flex-shrink: 0; }
+    .playlist-item.active .pl-icon { color: var(--gold); }
+
+    /* barrita EQ animada para canción activa */
+    .eq-bars {
+      display: flex; align-items: flex-end; gap: 2px;
+      height: 16px; width: 14px; flex-shrink: 0;
+    }
+    .eq-bar {
+      width: 3px; border-radius: 1px;
+      background: var(--gold);
+      animation: eqAnim var(--ed2,0.6s) ease-in-out infinite alternate;
+    }
+    .eq-bar:nth-child(2) { --ed2: 0.45s; }
+    .eq-bar:nth-child(3) { --ed2: 0.8s; }
+    @keyframes eqAnim {
+      from { height: 3px; }
+      to   { height: 14px; }
+    }
+    .eq-bars.paused .eq-bar { animation-play-state: paused; }
+
+    /* ── CARD REPRODUCTOR ── */
+    .player-card {
+      width: 100%; max-width: 350px;
+      background: linear-gradient(158deg, rgba(22,10,2,0.97) 0%, rgba(10,4,0,0.99) 100%);
+      border: 1px solid rgba(184,115,51,0.35);
+      border-radius: 22px;
+      padding: 22px 20px 20px;
+      box-shadow:
+        0 0 0 1px rgba(212,168,75,0.06),
+        0 24px 70px rgba(0,0,0,0.75),
+        inset 0 1px 0 rgba(212,168,75,0.18),
+        inset 0 -1px 0 rgba(184,115,51,0.08);
+      position: relative; overflow: hidden;
+    }
+    .player-card::before {
+      content: '';
+      position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-lt), transparent);
+      opacity: 0.5;
+    }
+    .player-card::after {
+      content: '';
+      position: absolute; inset: 0; border-radius: 22px;
+      background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(212,168,75,0.06), transparent 60%);
+      pointer-events: none;
+    }
+
+    /* logo mini + info */
+    .track-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 16px;
+    }
+    .player-logo-wrap { position: relative; flex-shrink: 0; }
+    .player-logo {
+      width: 60px; height: 60px; border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 16px rgba(184,115,51,0.35), 0 0 0 2px rgba(212,168,75,0.18);
+    }
+    .vinyl-spin {
+      position: absolute; inset: -4px; border-radius: 50%;
+      border: 1.5px dashed rgba(212,168,75,0.22);
+      animation: ringRotate 4s linear infinite;
+    }
+    .vinyl-spin.paused { animation-play-state: paused; }
+
+    .track-meta { flex: 1; min-width: 0; }
+    .track-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px; font-style: italic;
+      color: var(--gold-lt); margin-bottom: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .track-artist {
+      font-size: 11px; letter-spacing: 2px;
+      color: var(--dim); text-transform: uppercase;
+    }
+    .track-index {
+      font-size: 11px; color: var(--dim);
+      letter-spacing: 1px; margin-top: 3px;
+    }
+
+    /* waveform */
+    .waveform-wrap {
+      height: 40px; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 2.5px;
+      justify-content: center; cursor: pointer;
+    }
+    .wave-bar { width: 3px; border-radius: 3px; background: rgba(184,115,51,0.22); }
+    .wave-bar.active { background: linear-gradient(to top, var(--ember), var(--gold)); animation: wavePulse var(--dur,0.7s) ease-in-out infinite alternate; }
+    .wave-bar.played { background: linear-gradient(to top, var(--rust), var(--copper)); opacity: 0.75; }
+    @keyframes wavePulse { from { transform: scaleY(0.3); } to { transform: scaleY(1); } }
+
+    /* progreso */
+    .progress-wrap {
+      height: 5px; background: rgba(184,115,51,0.15);
+      border-radius: 3px; cursor: pointer;
+      position: relative; overflow: hidden; margin-bottom: 7px;
+    }
+    .progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--rust), var(--ember), var(--gold));
+      border-radius: 3px; transition: width 0.25s linear; pointer-events: none;
+    }
+    .progress-thumb {
+      position: absolute; top: 50%; left: 0%;
+      width: 11px; height: 11px;
+      background: var(--gold-lt); border-radius: 50%;
+      transform: translate(-50%,-50%);
+      box-shadow: 0 0 8px var(--glow);
+      transition: left 0.25s linear; pointer-events: none;
+    }
+
+    .time-row {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: var(--dim);
+      letter-spacing: 1px; margin-bottom: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+    #time-current { color: var(--copper); }
+
+    /* controles */
+    .controls {
+      display: flex; align-items: center;
+      justify-content: center; gap: 14px; margin-bottom: 18px;
+    }
+    .btn-aux {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: rgba(184,115,51,0.08);
+      border: 1px solid rgba(184,115,51,0.22);
+      color: var(--copper); font-size: 17px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.18s;
+      -webkit-tap-highlight-color: transparent; user-select: none;
+    }
+    .btn-aux:active { transform: scale(0.88); background: rgba(184,115,51,0.25); }
+
+    .btn-play {
+      width: 66px; height: 66px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--gold-lt), var(--gold), var(--copper));
+      border: none; color: var(--bg); font-size: 22px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 6px rgba(212,168,75,0.12), 0 0 22px rgba(212,168,75,0.35), 0 4px 14px rgba(0,0,0,0.5);
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent; user-select: none;
+      position: relative;
+    }
+    .btn-play::before {
+      content: ''; position: absolute; inset: -4px; border-radius: 50%;
+      border: 1px solid rgba(212,168,75,0.3);
+      animation: pulsering 2s ease-out infinite; opacity: 0;
+    }
+    .btn-play.playing::before { opacity: 1; }
+    @keyframes pulsering { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.35); opacity: 0; } }
+    .btn-play:active { transform: scale(0.92); }
+
+    /* volumen */
+    .volume-row { display: flex; align-items: center; gap: 10px; }
+    .vol-icon { font-size: 14px; color: var(--dim); flex-shrink: 0; }
+    .vol-slider {
+      flex: 1; -webkit-appearance: none; appearance: none;
+      height: 3px; border-radius: 2px;
+      background: rgba(184,115,51,0.2); cursor: pointer; outline: none;
+    }
+    .vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: radial-gradient(circle, var(--gold-lt), var(--gold));
+      box-shadow: 0 0 6px var(--glow); cursor: pointer;
+    }
+
+    /* status */
+    .status-msg {
+      text-align: center; font-size: 12px;
+      letter-spacing: 1.5px; color: var(--dim);
+      margin-top: 13px; min-height: 17px;
+      font-style: italic; transition: color 0.3s;
+    }
+    .status-msg.error { color: #d94f2a; }
+    .status-msg.ok    { color: var(--copper); }
+    .status-msg.play  { color: var(--gold); }
+
+    .footer-note {
+      margin-top: 24px; font-size: 11px;
+      letter-spacing: 4px; color: rgba(184,115,51,0.4);
+      text-transform: uppercase; text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="ember" style="left:15%;--delay:0s;  --ed:9s;  --dx:30px"></div>
+<div class="ember" style="left:30%;--delay:1.5s;--ed:11s; --dx:-20px"></div>
+<div class="ember" style="left:50%;--delay:0.7s;--ed:8s;  --dx:15px"></div>
+<div class="ember" style="left:65%;--delay:2.2s;--ed:10s; --dx:-35px"></div>
+<div class="ember" style="left:80%;--delay:3.1s;--ed:12s; --dx:25px"></div>
+<div class="ember" style="left:42%;--delay:4s;  --ed:9.5s;--dx:-10px"></div>
+
+<div class="scene">
+
+  <!-- Medallón -->
+  <div class="medallion-wrap">
+    <div class="medallion-outer"></div>
+    <div class="medallion-inner"></div>
+    <img class="logo-img"
+         src="logo_trapiche.png"
+         onerror="this.src='https://placehold.co/118x118/1a0800/d4a84b?text=TB'"
+         alt="Trapiche Bistro">
+  </div>
+
+  <h1 class="brand-title">Trapiche Bistro</h1>
+  <p class="brand-sub">Cocina Regional Sinaloense</p>
+
+  <div class="ornament">
+    <div class="ornament-line"></div>
+    <div class="ornament-diamond"></div>
+    <div class="ornament-line"></div>
+  </div>
+
+  <!-- Playlist -->
+  <div class="playlist" id="playlist"></div>
+
+  <!-- Reproductor -->
+  <div class="player-card">
+
+    <div class="track-header">
+      <div class="player-logo-wrap">
+        <img class="player-logo"
+             src="logo_trapiche.png"
+             onerror="this.src='https://placehold.co/60x60/1a0800/d4a84b?text=TB'"
+             alt="logo">
+        <div class="vinyl-spin paused" id="vinyl-ring"></div>
+      </div>
+      <div class="track-meta">
+        <div class="track-title"  id="track-title">—</div>
+        <div class="track-artist">Trapiche Bistro</div>
+        <div class="track-index"  id="track-index"></div>
+      </div>
+    </div>
+
+    <div class="waveform-wrap" id="waveform"></div>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-fill"  id="progress-fill"></div>
+      <div class="progress-thumb" id="progress-thumb"></div>
+    </div>
+    <div class="time-row">
+      <span id="time-current">0:00</span>
+      <span id="time-total">0:00</span>
+    </div>
+
+    <div class="controls">
+      <button class="btn-aux" id="btn-prev"    title="Anterior">&#9198;</button>
+      <button class="btn-play" id="btn-play">&#9654;</button>
+      <button class="btn-aux" id="btn-next"    title="Siguiente">&#9197;</button>
+    </div>
+
+    <div class="volume-row">
+      <span class="vol-icon">&#128264;</span>
+      <input type="range" class="vol-slider" id="vol-slider" min="0" max="1" step="0.02" value="1">
+      <span class="vol-icon">&#128266;</span>
+    </div>
+
+    <div class="status-msg" id="status-msg">Selecciona una canción</div>
+  </div>
+
+  <p class="footer-note">Escanea &middot; Escucha &middot; Disfruta</p>
+</div>
+
+<audio id="audio-el" preload="auto"></audio>
+
+<script>
+  /* ══════════════════════════════════════
+     PLAYLIST — agrega canciones aquí
+  ══════════════════════════════════════ */
+  const TRACKS = [
+    { title: 'Fuego en la Cocina',  file: 'fuego_en_la_cocina_v10_1.mp3' },
+    { title: 'Trapiche Bistro v16', file: 'trapiche_bistro_v16_2.mp3'     },
+    { title: 'Trapiche Bistro v17', file: 'trapiche_bistro_v17_3.mp3'     },
+    { title: 'El Sabor Llegó',      file: 'el_sabor_llego_v16.mp3'        },
+    // { title: 'Otra Canción', file: 'otra_cancion.mp3' },  ← agrega más así
+  ];
+
+  /* ── Refs ── */
+  const audio       = document.getElementById('audio-el');
+  const btnPlay     = document.getElementById('btn-play');
+  const progWrap    = document.getElementById('progress-wrap');
+  const progFill    = document.getElementById('progress-fill');
+  const progThumb   = document.getElementById('progress-thumb');
+  const timeCur     = document.getElementById('time-current');
+  const timeTot     = document.getElementById('time-total');
+  const volSlide    = document.getElementById('vol-slider');
+  const statusEl    = document.getElementById('status-msg');
+  const waveEl      = document.getElementById('waveform');
+  const vinylRing   = document.getElementById('vinyl-ring');
+  const trackTitle  = document.getElementById('track-title');
+  const trackIndex  = document.getElementById('track-index');
+  const playlistEl  = document.getElementById('playlist');
+
+  let currentIdx = 0;
+  let isPlaying  = false;
+
+  /* ── Waveform ── */
+  const bars = [];
+  const BAR_COUNT = 30;
+  const heights = Array.from({ length: BAR_COUNT }, () => 6 + Math.random() * 20);
+  for (let i = 0; i < BAR_COUNT; i++) {
+    const b = document.createElement('div');
+    b.className = 'wave-bar';
+    b.style.height = heights[i] + 'px';
+    b.style.setProperty('--dur', (0.45 + Math.random() * 0.75).toFixed(2) + 's');
+    b.style.animationDelay = (i * 0.04).toFixed(2) + 's';
+    waveEl.appendChild(b);
+    bars.push(b);
+  }
+  function updateWaveBars(pct) {
+    const pivot = Math.floor(pct * BAR_COUNT);
+    bars.forEach((b, i) => {
+      b.classList.remove('active', 'played');
+      if (i < pivot) b.classList.add('played');
+    });
+  }
+  function startWave() {
+    const pivot = Math.floor((audio.currentTime / (audio.duration || 1)) * BAR_COUNT);
+    bars.forEach((b, i) => { if (i >= pivot) b.classList.add('active'); });
+    vinylRing.classList.remove('paused');
+  }
+  function stopWave() {
+    bars.forEach(b => b.classList.remove('active'));
+    vinylRing.classList.add('paused');
+  }
+
+  /* ── Playlist UI ── */
+  function buildPlaylist() {
+    playlistEl.innerHTML = '';
+    TRACKS.forEach((t, i) => {
+      const item = document.createElement('div');
+      item.className = 'playlist-item' + (i === currentIdx ? ' active' : '');
+      item.innerHTML = `
+        <span class="pl-num">${i + 1}</span>
+        <div class="pl-info">
+          <div class="pl-title">${t.title}</div>
+          <div class="pl-artist">Trapiche Bistro</div>
+        </div>
+        <div class="eq-bars${i === currentIdx && isPlaying ? '' : ' paused'}" id="eq-${i}">
+          <div class="eq-bar" style="--ed2:.55s"></div>
+          <div class="eq-bar" style="--ed2:.4s"></div>
+          <div class="eq-bar" style="--ed2:.7s"></div>
+        </div>
+      `;
+      item.addEventListener('click', () => loadTrack(i, true));
+      playlistEl.appendChild(item);
+    });
+  }
+
+  function updatePlaylistActive() {
+    document.querySelectorAll('.playlist-item').forEach((el, i) => {
+      el.classList.toggle('active', i === currentIdx);
+      const eq = document.getElementById('eq-' + i);
+      if (eq) eq.classList.toggle('paused', !(i === currentIdx && isPlaying));
+    });
+  }
+
+  /* ── Cargar pista ── */
+  function loadTrack(idx, autoplay = false) {
+    currentIdx = idx;
+    const t = TRACKS[idx];
+    audio.src = t.file;
+    audio.load();
+    trackTitle.textContent = t.title;
+    trackIndex.textContent = `${idx + 1} de ${TRACKS.length}`;
+    progFill.style.width  = '0%';
+    progThumb.style.left  = '0%';
+    timeCur.textContent   = '0:00';
+    timeTot.textContent   = '0:00';
+    stopWave();
+    updateWaveBars(0);
+    setStatus('Cargando…');
+    updatePlaylistActive();
+    if (autoplay) {
+      audio.addEventListener('canplay', function onCanPlay() {
+        audio.removeEventListener('canplay', onCanPlay);
+        doPlay();
+      }, { once: true });
+    }
+  }
+
+  async function doPlay() {
+    try {
+      await audio.play();
+      btnPlay.innerHTML = '&#9646;&#9646;';
+      btnPlay.classList.add('playing');
+      isPlaying = true;
+      startWave();
+      setStatus('Reproduciendo…', 'play');
+      updatePlaylistActive();
+    } catch (e) {
+      setStatus('Toca para reproducir.', 'error');
+    }
+  }
+
+  function doPause() {
+    audio.pause();
+    btnPlay.innerHTML = '&#9654;';
+    btnPlay.classList.remove('playing');
+    isPlaying = false;
+    stopWave();
+    setStatus('Pausado');
+    updatePlaylistActive();
+  }
+
+  /* ── Utilidades ── */
+  function fmt(s) {
+    if (!isFinite(s)) return '0:00';
+    return Math.floor(s / 60) + ':' + Math.floor(s % 60).toString().padStart(2, '0');
+  }
+  function setStatus(msg, cls) {
+    statusEl.textContent = msg;
+    statusEl.className = 'status-msg' + (cls ? ' ' + cls : '');
+  }
+
+  /* ── Eventos audio ── */
+  audio.addEventListener('loadedmetadata', () => { timeTot.textContent = fmt(audio.duration); });
+  audio.addEventListener('canplay',        () => { if (!isPlaying) setStatus('Listo para reproducir', 'ok'); });
+  audio.addEventListener('error',          () => setStatus('No se encontró el audio. Verifica el nombre del MP3.', 'error'));
+  audio.addEventListener('waiting',        () => setStatus('Cargando…'));
+
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const pct = audio.currentTime / audio.duration;
+    progFill.style.width = (pct * 100).toFixed(2) + '%';
+    progThumb.style.left = (pct * 100).toFixed(2) + '%';
+    timeCur.textContent  = fmt(audio.currentTime);
+    if (!isPlaying) updateWaveBars(pct);
+  });
+
+  audio.addEventListener('ended', () => {
+    isPlaying = false;
+    stopWave();
+    updateWaveBars(1);
+    // avance automático a la siguiente canción
+    if (currentIdx < TRACKS.length - 1) {
+      loadTrack(currentIdx + 1, true);
+    } else {
+      btnPlay.innerHTML = '&#9654;';
+      btnPlay.classList.remove('playing');
+      setStatus('— Fin de la playlist —', 'ok');
+      progFill.style.width = '100%';
+      progThumb.style.left = '100%';
+      updatePlaylistActive();
+    }
+  });
+
+  /* ── Controles ── */
+  btnPlay.addEventListener('click', async () => {
+    if (!audio.src || audio.src === window.location.href) { loadTrack(0, true); return; }
+    if (audio.paused) doPlay(); else doPause();
+  });
+
+  document.getElementById('btn-prev').addEventListener('click', () => {
+    if (audio.currentTime > 3) { audio.currentTime = 0; return; }
+    const idx = (currentIdx - 1 + TRACKS.length) % TRACKS.length;
+    loadTrack(idx, isPlaying);
+  });
+
+  document.getElementById('btn-next').addEventListener('click', () => {
+    const idx = (currentIdx + 1) % TRACKS.length;
+    loadTrack(idx, isPlaying);
+  });
+
+  progWrap.addEventListener('click', e => {
+    if (!audio.duration) return;
+    const r = progWrap.getBoundingClientRect();
+    audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+  });
+
+  volSlide.addEventListener('input', () => { audio.volume = parseFloat(volSlide.value); });
+
+  /* ── Inicializar ── */
+  buildPlaylist();
+  loadTrack(0, false);
+</script>
+</body>
+</html>
