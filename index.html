@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0e0c">
+  <meta name="description" content="Trapiche Bistro — Cocina Regional Sinaloense. Menú y música ambiental.">
+  <title>Trapiche Bistro · Menú &amp; Música</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      /* Paleta: Verde bosque profundo + Ámbar cálido + Humo */
+      --bg-0:        #080d0a;
+      --bg-1:        #0e1510;
+      --bg-2:        #141d16;
+      --bg-card:     rgba(14, 21, 16, 0.94);
+      --text-1:      #e2ddd6;
+      --text-2:      #a09688;
+      --text-3:      #627060;
+      --amber:       #c8943a;
+      --amber-lt:    #dba84e;
+      --amber-dk:    #9e6e28;
+      --sage:        #7aaf86;
+      --sage-dk:     #4e7e5a;
+      --border-1:    rgba(200, 148, 58, 0.18);
+      --border-2:    rgba(200, 148, 58, 0.35);
+      --glow-a:      rgba(200, 148, 58, 0.22);
+      --glow-s:      rgba(122, 175, 134, 0.15);
+      --ease:        cubic-bezier(.4,0,.2,1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-0);
+      color: var(--text-1);
+      line-height: 1.55;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ── CANVAS PARTÍCULAS ── */
+    #cnv {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── ONDAS FLOTANTES SVG ── */
+    .wave-bg {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 220px;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.07;
+    }
+
+    /* ── CONTENIDO ── */
+    .wrap {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 2.8rem 1.5rem 2rem;
+      border-bottom: 1px solid var(--border-1);
+      background: linear-gradient(180deg, rgba(8,13,10,0.96) 0%, rgba(8,13,10,0.80) 100%);
+    }
+
+    .logo-ring {
+      display: inline-block;
+      width: 108px; height: 108px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, var(--amber), var(--sage-dk));
+      margin-bottom: 1.1rem;
+      box-shadow: 0 0 28px var(--glow-a);
+    }
+
+    .logo-ring img {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      background: var(--bg-1);
+    }
+
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.4rem;
+      color: var(--amber-lt);
+      letter-spacing: -.5px;
+      line-height: 1.1;
+      margin-bottom: .2rem;
+    }
+
+    .hero-eyebrow {
+      font-size: .68rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: .8rem;
+    }
+
+    .divider {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; max-width: 180px; margin: 0 auto;
+    }
+    .divider-line {
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--amber-dk), transparent);
+    }
+    .divider-gem {
+      width: 5px; height: 5px;
+      background: var(--amber);
+      transform: rotate(45deg);
+    }
+
+    /* ── LAYOUT ── */
+    .main-layout {
+      display: flex;
+      flex-wrap: wrap;
+      flex: 1;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ── MENÚ ── */
+    .menu-section {
+      flex: 1;
+      min-width: 280px;
+      padding: 2rem 2rem 2rem 2rem;
+      border-right: 1px solid var(--border-1);
+    }
+
+    .menu-section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.7rem;
+      color: var(--amber-lt);
+      margin-bottom: .2rem;
+    }
+
+    .menu-section-sub {
+      font-size: .65rem;
+      letter-spacing: 3px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      margin-bottom: 1.8rem;
+    }
+
+    .category { margin-bottom: 2rem; }
+
+    .cat-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.05rem;
+      color: var(--sage);
+      border-left: 3px solid var(--sage-dk);
+      padding-left: 10px;
+      margin-bottom: .9rem;
+      letter-spacing: .2px;
+    }
+
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: .42rem 0;
+      border-bottom: 1px dashed var(--border-1);
+      font-size: .875rem;
+    }
+
+    .item-name { color: var(--text-2); }
+    .item-price {
+      color: var(--amber-lt);
+      font-weight: 600;
+      white-space: nowrap;
+      margin-left: 1rem;
+    }
+
+    .item-desc {
+      font-size: .68rem;
+      color: var(--text-3);
+      font-style: italic;
+      margin-top: .1rem;
+      margin-bottom: .4rem;
+    }
+
+    .combo-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: .5rem;
+      font-size: .68rem;
+    }
+    .combo-table th {
+      text-align: left;
+      color: var(--amber);
+      font-weight: 500;
+      padding: 3px 0;
+    }
+    .combo-table td {
+      padding: 3px 0;
+      color: var(--text-2);
+    }
+
+    /* ── REPRODUCTOR ── */
+    .player-section {
+      flex: 0 0 370px;
+      padding: 2rem 1.5rem;
+      background: linear-gradient(160deg, rgba(14,21,16,.75), rgba(8,13,10,.92));
+      backdrop-filter: blur(6px);
+    }
+
+    .player-header {
+      text-align: center;
+      margin-bottom: 1.4rem;
+    }
+
+    .player-header h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      color: var(--amber-lt);
+    }
+
+    .player-header p {
+      font-size: .63rem;
+      letter-spacing: 3px;
+      color: var(--text-3);
+      text-transform: uppercase;
+    }
+
+    /* ── PLAYLIST ── */
+    .playlist {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      margin-bottom: 1.4rem;
+      max-height: 270px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .playlist::-webkit-scrollbar { width: 3px; }
+    .playlist::-webkit-scrollbar-track { background: var(--border-1); }
+    .playlist::-webkit-scrollbar-thumb { background: var(--amber-dk); border-radius: 2px; }
+
+    .pl-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: .55rem .75rem;
+      background: rgba(200,148,58,.04);
+      border: 1px solid var(--border-1);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .2s var(--ease), border-color .2s var(--ease), transform .15s var(--ease);
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .pl-item:hover {
+      background: rgba(200,148,58,.1);
+      border-color: var(--amber-dk);
+      transform: translateX(3px);
+    }
+
+    .pl-item.active {
+      background: rgba(200,148,58,.13);
+      border-color: var(--amber);
+      box-shadow: 0 0 12px var(--glow-a);
+    }
+
+    .pl-num {
+      font-size: .68rem;
+      color: var(--text-3);
+      width: 20px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .pl-info { flex: 1; min-width: 0; }
+
+    .pl-title {
+      font-size: .83rem;
+      font-weight: 500;
+      color: var(--text-1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pl-artist {
+      font-size: .6rem;
+      color: var(--text-3);
+      text-transform: uppercase;
+    }
+
+    .pl-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    .pl-bars span {
+      width: 3px;
+      border-radius: 1px;
+      background: var(--amber);
+      height: 3px;
+      opacity: 0;
+      transition: height .15s, opacity .15s;
+    }
+
+    .pl-item.active .pl-bars span {
+      opacity: 1;
+      animation: eq 0.7s ease-in-out infinite alternate;
+    }
+
+    .pl-item.active .pl-bars span:nth-child(2) { animation-delay: .25s; }
+    .pl-item.active .pl-bars span:nth-child(3) { animation-delay: .5s; }
+
+    @keyframes eq {
+      from { height: 3px; }
+      to   { height: 13px; }
+    }
+
+    /* ── PLAYER CARD ── */
+    .player-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-2);
+      border-radius: 18px;
+      padding: 1.2rem 1.1rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    }
+
+    .track-row {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-bottom: .9rem;
+    }
+
+    .track-thumb {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--amber-dk);
+      flex-shrink: 0;
+      background: var(--bg-2);
+    }
+
+    .track-details { flex: 1; min-width: 0; }
+
+    .track-name {
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--amber-lt);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-sub {
+      font-size: .6rem;
+      color: var(--text-3);
+      text-transform: uppercase;
+    }
+
+    /* ── VISUALIZADOR ── */
+    .vis-wrap {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      margin-bottom: .8rem;
+      overflow: hidden;
+    }
+
+    .vbar {
+      width: 3px;
+      background: linear-gradient(to top, var(--sage-dk), var(--amber));
+      border-radius: 2px;
+      height: 3px;
+      transition: height .06s linear;
+    }
+
+    /* ── PROGRESO ── */
+    .prog-wrap { margin-bottom: .6rem; }
+
+    .prog-track {
+      height: 4px;
+      background: var(--border-1);
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .prog-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--sage-dk), var(--amber));
+      border-radius: 3px;
+      position: relative;
+      transition: width .1s linear;
+    }
+
+    .prog-fill::after {
+      content: '';
+      position: absolute;
+      right: -4px; top: 50%;
+      transform: translateY(-50%);
+      width: 10px; height: 10px;
+      background: var(--amber-lt);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--glow-a);
+      opacity: 0;
+      transition: opacity .15s;
+    }
+
+    .prog-track:hover .prog-fill::after { opacity: 1; }
+
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: .65rem;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    /* ── CONTROLES ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin: .9rem 0;
+    }
+
+    .ctrl-btn {
+      background: rgba(200,148,58,.08);
+      border: 1px solid var(--border-2);
+      border-radius: 50%;
+      width: 42px; height: 42px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--amber-lt);
+      font-size: 1rem;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .ctrl-btn:hover {
+      background: rgba(200,148,58,.2);
+      transform: scale(1.06);
+    }
+
+    .ctrl-btn:active { transform: scale(.96); }
+
+    .play-btn {
+      width: 60px; height: 60px;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--amber), var(--sage-dk));
+      border: none;
+      color: var(--bg-0);
+      box-shadow: 0 0 18px var(--glow-a);
+    }
+
+    .play-btn:hover {
+      box-shadow: 0 0 26px var(--glow-a), 0 0 10px var(--glow-s);
+      transform: scale(1.06);
+    }
+
+    /* ── VOLUMEN ── */
+    .vol-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: .4rem;
+    }
+
+    .vol-icon { font-size: .85rem; color: var(--text-3); }
+
+    .vol-slider {
+      flex: 1;
+      height: 3px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--border-1);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px; height: 13px;
+      background: var(--amber-lt);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 4px var(--glow-a);
+    }
+
+    .status-line {
+      text-align: center;
+      font-size: .68rem;
+      color: var(--text-3);
+      margin-top: .75rem;
+      font-style: italic;
+      min-height: 1em;
+    }
+
+    /* ── WELCOME OVERLAY ── */
+    #welcome-overlay {
+      position: fixed; inset: 0;
+      background: rgba(8,13,10,.92);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .ov-logo {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      border: 3px solid var(--amber);
+      object-fit: cover;
+      box-shadow: 0 0 30px var(--glow-a);
+      animation: pulse-ring 2s ease-in-out infinite;
+      background: var(--bg-1);
+    }
+
+    @keyframes pulse-ring {
+      0%, 100% { box-shadow: 0 0 20px var(--glow-a); }
+      50% { box-shadow: 0 0 40px rgba(200,148,58,.35); }
+    }
+
+    .ov-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      color: var(--amber-lt);
+    }
+
+    .ov-sub {
+      font-size: .75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    .ov-note {
+      font-size: .82rem;
+      color: var(--text-2);
+      max-width: 280px;
+    }
+
+    .ov-btn {
+      padding: .85rem 2.2rem;
+      background: linear-gradient(135deg, var(--amber), var(--sage-dk));
+      border: none;
+      border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--bg-0);
+      cursor: pointer;
+      box-shadow: 0 0 24px var(--glow-a);
+      transition: transform .15s, box-shadow .15s;
+      -webkit-tap-highlight-color: transparent;
+      letter-spacing: .5px;
+    }
+
+    .ov-btn:hover { transform: scale(1.04); box-shadow: 0 0 32px var(--glow-a); }
+    .ov-btn:active { transform: scale(.97); }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 1.2rem;
+      border-top: 1px solid var(--border-1);
+      font-size: .62rem;
+      letter-spacing: 2px;
+      color: var(--text-3);
+      text-transform: uppercase;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .main-layout { flex-direction: column; }
+      .menu-section { border-right: none; border-bottom: 1px solid var(--border-1); padding: 1.5rem; }
+      .player-section { flex: none; width: 100%; }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 1.9rem; }
+      .player-section { padding: 1.5rem 1rem; }
+    }
+
+    /* ── FADE IN ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero        { animation: fadeUp .55s var(--ease) both; }
+    .menu-section { animation: fadeUp .6s .1s var(--ease) both; }
+    .player-section { animation: fadeUp .6s .2s var(--ease) both; }
+  </style>
+</head>
+<body>
+
+<!-- Canvas de partículas interactivas -->
+<canvas id="cnv"></canvas>
+
+<!-- Onda SVG decorativa de fondo -->
+<svg class="wave-bg" viewBox="0 0 1440 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <path fill="var(--amber)" d="M0,80 C240,140 480,20 720,80 C960,140 1200,20 1440,80 L1440,220 L0,220 Z"/>
+  <path fill="var(--sage)" d="M0,120 C240,60 480,160 720,120 C960,80 1200,160 1440,120 L1440,220 L0,220 Z" opacity=".6"/>
+</svg>
+
+<!-- OVERLAY DE BIENVENIDA -->
+<div id="welcome-overlay">
+  <img class="ov-logo" src="logo_trapiche.png" alt="Trapiche Bistro"
+    onerror="this.src='https://placehold.co/100x100/0e1510/c8943a?text=TB'">
+  <div>
+    <div class="ov-title">Trapiche Bistro</div>
+    <div class="ov-sub">Cocina Regional Sinaloense</div>
+  </div>
+  <p class="ov-note">Toca el botón para entrar y escuchar</p>
+  <button class="ov-btn" id="enter-btn">▶ &nbsp;Entrar &amp; Escuchar</button>
+</div>
+
+<!-- CONTENIDO PRINCIPAL -->
+<div class="wrap">
+  <!-- HERO -->
+  <header class="hero">
+    <div class="logo-ring">
+      <img src="logo_trapiche.png" alt="Trapiche Bistro"
+        onerror="this.src='https://placehold.co/102x102/0e1510/c8943a?text=TB'">
+    </div>
+    <h1>Trapiche Bistro</h1>
+    <p class="hero-eyebrow">Cocina Regional Sinaloense</p>
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-gem"></div>
+      <div class="divider-line"></div>
+    </div>
+  </header>
+
+  <div class="main-layout">
+
+    <!-- ── MENÚ ── -->
+    <div class="menu-section">
+      <div class="menu-section-title">Menú</div>
+      <p class="menu-section-sub">Selección del día</p>
+
+      <div class="category">
+        <div class="cat-title">Entradas</div>
+        <div class="menu-item"><span class="item-name">Coctel de frutas</span><span class="item-price">$108</span></div>
+        <div class="menu-item"><span class="item-name">Hot Cakes Tradicionales (3 pzas)</span><span class="item-price">$123</span></div>
+        <div class="menu-item"><span class="item-name">Kekis (3 pzas)</span><span class="item-price">$123</span></div>
+        <div class="menu-item"><span class="item-name">Pan francés brioche</span><span class="item-price">$148</span></div>
+        <div class="menu-item"><span class="item-name">Molletes especiales</span><span class="item-price">$108</span></div>
+        <div class="menu-item"><span class="item-name">Tamal de elote</span><span class="item-price">$60</span></div>
+        <div class="menu-item"><span class="item-name">Tamal de elote gratinado</span><span class="item-price">$70</span></div>
+        <div class="menu-item"><span class="item-name">Guacamole</span><span class="item-price">$95</span></div>
+        <div class="menu-item"><span class="item-name">Quesadillas de harina (3 pzas)</span><span class="item-price">$79</span></div>
+        <div class="menu-item"><span class="item-name">Gorditas con birria (3 pzas)</span><span class="item-price">$185</span></div>
+      </div>
+
+      <div class="category">
+        <div class="cat-title">Huevos al Gusto</div>
+        <div class="menu-item"><span class="item-name">Con chorizo</span><span class="item-price">$153</span></div>
+        <div class="item-desc">2 huevos revueltos · acompañados de frijol y queso</div>
+        <div class="menu-item"><span class="item-name">Rancheros</span><span class="item-price">$153</span></div>
+        <div class="menu-item"><span class="item-name">Divorciados</span><span class="item-price">$153</span></div>
+      </div>
+
+      <div class="category">
+        <div class="cat-title">Chilaquiles</div>
+        <div class="menu-item"><span class="item-name">Verdes</span><span class="item-price">$153</span></div>
+        <div class="menu-item"><span class="item-name">Rojos</span><span class="item-price">$153</span></div>
+        <div class="menu-item"><span class="item-name">Suizos</span><span class="item-price">$163</span></div>
+        <div class="menu-item"><span class="item-name">Poblanos</span><span class="item-price">$163</span></div>
+      </div>
+
+      <div class="category">
+        <div class="cat-title">Platillos Típicos Sinaloenses</div>
+        <div class="menu-item"><span class="item-name">Machaca de res al gusto</span><span class="item-price">$203</span></div>
+        <div class="menu-item"><span class="item-name">Carne asada a la mexicana</span><span class="item-price">$228</span></div>
+        <div class="menu-item"><span class="item-name">Lengua</span><span class="item-price">$258</span></div>
+        <div class="menu-item"><span class="item-name">Hígado encebollado</span><span class="item-price">$275</span></div>
+      </div>
+
+      <div class="category">
+        <div class="cat-title">Combos</div>
+        <div class="menu-item"><span class="item-name">Mi Gusto Pa</span><span class="item-price">$228</span></div>
+        <div class="menu-item"><span class="item-name">Mi Gusto Especial</span><span class="item-price">$248</span></div>
+        <table class="combo-table">
+          <thead><tr><th>Proteínas</th><th>Guarniciones</th></tr></thead>
+          <tbody>
+            <tr><td>Machaca (35 g)</td><td>Frijol naturel</td></tr>
+            <tr><td>Chorizo (70 g)</td><td>Tamal de elote</td></tr>
+            <tr><td>Chilorio (40 g)</td><td>Rajas poblanas</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /menu-section -->
+
+    <!-- ── REPRODUCTOR ── -->
+    <div class="player-section">
+      <div class="player-header">
+        <h3>Ambiente Musical</h3>
+        <p>Trapiche Bistro</p>
+      </div>
+
+      <!-- Lista de canciones -->
+      <div class="playlist" id="playlist"></div>
+
+      <!-- Tarjeta reproductora -->
+      <div class="player-card">
+        <div class="track-row">
+          <img class="track-thumb" id="track-thumb" src="logo_trapiche.png" alt="pista"
+            onerror="this.src='https://placehold.co/48x48/141d16/c8943a?text=♪'">
+          <div class="track-details">
+            <div class="track-name" id="track-name">— Selecciona una pista —</div>
+            <div class="track-sub">Trapiche Bistro</div>
+          </div>
+        </div>
+
+        <!-- Visualizador de onda -->
+        <div class="vis-wrap" id="visualizer"></div>
+
+        <!-- Barra de progreso -->
+        <div class="prog-wrap">
+          <div class="prog-track" id="prog-track">
+            <div class="prog-fill" id="prog-fill"></div>
+          </div>
+          <div class="time-row">
+            <span id="cur-time">0:00</span>
+            <span id="tot-time">0:00</span>
+          </div>
+        </div>
+
+        <!-- Controles -->
+        <div class="controls">
+          <button class="ctrl-btn" id="prev-btn" title="Anterior">&#9664;&#9664;</button>
+          <button class="ctrl-btn play-btn" id="play-btn" title="Reproducir / Pausa">&#9654;</button>
+          <button class="ctrl-btn" id="next-btn" title="Siguiente">&#9654;&#9654;</button>
+        </div>
+
+        <!-- Volumen -->
+        <div class="vol-row">
+          <span class="vol-icon">🔈</span>
+          <input type="range" class="vol-slider" id="vol-slider"
+            min="0" max="1" step="0.01" value="0.8">
+          <span class="vol-icon">🔊</span>
+        </div>
+
+        <div class="status-line" id="status">Bienvenido · Selecciona una pista</div>
+      </div>
+    </div><!-- /player-section -->
+
+  </div><!-- /main-layout -->
+
+  <footer class="footer">
+    Trapiche Bistro &nbsp;·&nbsp; Cocina Regional Sinaloense &nbsp;·&nbsp; Escucha · Disfruta
+  </footer>
+</div><!-- /wrap -->
+
+<!-- Elemento de audio -->
+<audio id="audio" preload="none"></audio>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  CONFIGURACIÓN DE PISTAS
+//  IMPORTANTE: Los nombres de archivo deben coincidir EXACTAMENTE
+//  con los archivos en tu repositorio de GitHub (mayúsculas/minúsculas).
+// ═══════════════════════════════════════════════════════════
+const TRACKS = [
+  { title: "Bienvenida",           file: "bienvenida.mp3" },
+  { title: "El Sabor es la Ley",   file: "el_sabor_es_la_ley.mp3" },
+  { title: "El Sabor Llegó",       file: "el_sabor_llego.mp3" },
+  { title: "Fuego en la Cocina",   file: "fuego_en_la_cocina.mp3" },
+  { title: "La Mesa Llama",        file: "la_mesa_llama.mp3" },
+  { title: "Orgullo Sinaloense",   file: "orgullo_sinaloense.mp3" }
+];
+
+// ═══════════════════════════════════════════════════════════
+//  REFERENCIAS DOM
+// ═══════════════════════════════════════════════════════════
+const audio      = document.getElementById('audio');
+const playBtn    = document.getElementById('play-btn');
+const prevBtn    = document.getElementById('prev-btn');
+const nextBtn    = document.getElementById('next-btn');
+const progTrack  = document.getElementById('prog-track');
+const progFill   = document.getElementById('prog-fill');
+const curTimeEl  = document.getElementById('cur-time');
+const totTimeEl  = document.getElementById('tot-time');
+const volSlider  = document.getElementById('vol-slider');
+const statusEl   = document.getElementById('status');
+const trackNameEl= document.getElementById('track-name');
+const playlistEl = document.getElementById('playlist');
+const visEl      = document.getElementById('visualizer');
+const enterBtn   = document.getElementById('enter-btn');
+const overlay    = document.getElementById('welcome-overlay');
+
+// ═══════════════════════════════════════════════════════════
+//  ESTADO
+// ═══════════════════════════════════════════════════════════
+let currentIdx  = 0;
+let isPlaying   = false;
+let vBars       = [];
+let rafId       = null;
+let wantsPlay   = false;   // para reproducir tras carga
+
+// ═══════════════════════════════════════════════════════════
+//  PARTÍCULAS INTERACTIVAS EN CANVAS
+// ═══════════════════════════════════════════════════════════
+(function initParticles() {
+  const cnv = document.getElementById('cnv');
+  const ctx = cnv.getContext('2d');
+  let W, H, parts = [];
+  let mouse = { x: -9999, y: -9999 };
+
+  function resize() {
+    W = cnv.width  = window.innerWidth;
+    H = cnv.height = window.innerHeight;
+  }
+
+  function spawn() {
+    parts = [];
+    const count = Math.min(80, Math.floor(W * H / 12000));
+    for (let i = 0; i < count; i++) {
+      parts.push({
+        x:  Math.random() * W,
+        y:  Math.random() * H,
+        r:  Math.random() * 1.8 + 0.6,
+        a:  Math.random() * 0.35 + 0.07,
+        vx: (Math.random() - .5) * 0.28,
+        vy: (Math.random() - .5) * 0.18 + 0.06,
+        // color: mezcla ámbar/sage aleatoriamente
+        hue: Math.random() < .6 ? 'amber' : 'sage'
+      });
+    }
+  }
+
+  // Ondas de sonido flotantes (círculos concéntricos desde el centro del player)
+  let waves = [];
+  function emitWave() {
+    if (!isPlaying) return;
+    waves.push({ x: W * .75, y: H * .55, r: 0, maxR: 120, a: .18 });
+  }
+  setInterval(emitWave, 1800);
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Dibujar ondas
+    for (let i = waves.length - 1; i >= 0; i--) {
+      const w = waves[i];
+      w.r   += 1.2;
+      w.a   -= 0.002;
+      if (w.a <= 0 || w.r > w.maxR) { waves.splice(i, 1); continue; }
+      ctx.beginPath();
+      ctx.arc(w.x, w.y, w.r, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(200,148,58,${w.a})`;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
+
+    // Dibujar partículas
+    for (const p of parts) {
+      // Atracción leve al mouse
+      const dx = mouse.x - p.x, dy = mouse.y - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 120) {
+        p.vx += dx / dist * 0.04;
+        p.vy += dy / dist * 0.04;
+      }
+      // Fricción
+      p.vx *= 0.98; p.vy *= 0.98;
+
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+
+      const color = p.hue === 'amber'
+        ? `rgba(200,148,58,${p.a})`
+        : `rgba(122,175,134,${p.a})`;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    // Conexiones entre partículas cercanas
+    for (let i = 0; i < parts.length; i++) {
+      for (let j = i + 1; j < parts.length; j++) {
+        const dx = parts[i].x - parts[j].x;
+        const dy = parts[i].y - parts[j].y;
+        const d  = Math.sqrt(dx*dx + dy*dy);
+        if (d < 90) {
+          ctx.beginPath();
+          ctx.moveTo(parts[i].x, parts[i].y);
+          ctx.lineTo(parts[j].x, parts[j].y);
+          ctx.strokeStyle = `rgba(200,148,58,${(.10 * (1 - d/90)).toFixed(3)})`;
+          ctx.lineWidth = .5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', () => { resize(); spawn(); });
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener('touchmove', e => {
+    mouse.x = e.touches[0].clientX;
+    mouse.y = e.touches[0].clientY;
+  }, { passive: true });
+
+  resize(); spawn(); loop();
+})();
+
+// ═══════════════════════════════════════════════════════════
+//  VISUALIZADOR DE BARRAS
+// ═══════════════════════════════════════════════════════════
+function buildVisualizer() {
+  visEl.innerHTML = '';
+  vBars = [];
+  for (let i = 0; i < 36; i++) {
+    const b = document.createElement('div');
+    b.className = 'vbar';
+    visEl.appendChild(b);
+    vBars.push(b);
+  }
+}
+
+function tickVis() {
+  if (!isPlaying) {
+    vBars.forEach(b => b.style.height = '3px');
+    return;
+  }
+  const t = Date.now() * 0.004;
+  const intensity = isPlaying ? 1 : 0.2;
+  vBars.forEach((b, i) => {
+    const v = (Math.sin(t + i * 0.45) * 0.5 + 0.5)
+            * (Math.sin(t * 1.3 + i * 0.2) * 0.3 + 0.7);
+    const h = 3 + v * 38 * intensity;
+    b.style.height = h.toFixed(1) + 'px';
+  });
+  rafId = requestAnimationFrame(tickVis);
+}
+
+function startVis() {
+  if (rafId) cancelAnimationFrame(rafId);
+  tickVis();
+}
+
+function stopVis() {
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+  vBars.forEach(b => b.style.height = '3px');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PLAYLIST UI
+// ═══════════════════════════════════════════════════════════
+function buildPlaylist() {
+  playlistEl.innerHTML = '';
+  TRACKS.forEach((t, i) => {
+    const el = document.createElement('div');
+    el.className = 'pl-item' + (i === currentIdx ? ' active' : '');
+    el.dataset.idx = i;
+    el.innerHTML = `
+      <span class="pl-num">${i + 1}</span>
+      <div class="pl-info">
+        <div class="pl-title">${t.title}</div>
+        <div class="pl-artist">Trapiche Bistro</div>
+      </div>
+      <div class="pl-bars"><span></span><span></span><span></span></div>
+    `;
+    el.addEventListener('click', () => loadTrack(i, true));
+    // Soporte touch explícito
+    el.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      loadTrack(i, true);
+    });
+    playlistEl.appendChild(el);
+  });
+}
+
+function updatePlaylistActive() {
+  document.querySelectorAll('.pl-item').forEach((el, i) => {
+    el.classList.toggle('active', i === currentIdx);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CARGA Y REPRODUCCIÓN
+// ═══════════════════════════════════════════════════════════
+function fmt(s) {
+  if (!isFinite(s) || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+function setStatus(txt) { statusEl.textContent = txt; }
+
+function setPlayIcon(playing) {
+  playBtn.innerHTML = playing ? '⏸' : '&#9654;';
+}
+
+function loadTrack(idx, autoplay) {
+  if (idx < 0) idx = TRACKS.length - 1;
+  if (idx >= TRACKS.length) idx = 0;
+
+  currentIdx = idx;
+  const t = TRACKS[idx];
+
+  // Resetear barra de progreso
+  progFill.style.width = '0%';
+  curTimeEl.textContent = '0:00';
+  totTimeEl.textContent = '0:00';
+
+  trackNameEl.textContent = t.title;
+  audio.src = t.file;
+  audio.load();
+
+  updatePlaylistActive();
+  stopVis();
+  setPlayIcon(false);
+  isPlaying = false;
+
+  if (autoplay) {
+    wantsPlay = true;
+    setStatus('Cargando · ' + t.title + '…');
+    // Intentar reproducir inmediatamente; si falla esperamos canplay
+    const p = audio.play();
+    if (p !== undefined) {
+      p.then(() => {
+        isPlaying = true;
+        wantsPlay = false;
+        setPlayIcon(true);
+        setStatus('Reproduciendo · ' + t.title);
+        startVis();
+      }).catch(() => {
+        // El navegador bloqueó; esperamos evento canplay
+        setStatus('Cargando…');
+      });
+    }
+  } else {
+    wantsPlay = false;
+    setStatus('Listo · ' + t.title);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EVENTOS DEL ELEMENTO AUDIO
+// ═══════════════════════════════════════════════════════════
+audio.addEventListener('canplay', () => {
+  totTimeEl.textContent = fmt(audio.duration);
+  if (wantsPlay && !isPlaying) {
+    audio.play().then(() => {
+      isPlaying = true;
+      wantsPlay = false;
+      setPlayIcon(true);
+      setStatus('Reproduciendo · ' + TRACKS[currentIdx].title);
+      startVis();
+    }).catch(err => {
+      setStatus('Error al reproducir — ' + err.message);
+      wantsPlay = false;
+    });
+  }
+});
+
+audio.addEventListener('loadedmetadata', () => {
+  totTimeEl.textContent = fmt(audio.duration);
+});
+
+audio.addEventListener('timeupdate', () => {
+  if (!audio.duration) return;
+  const pct = (audio.currentTime / audio.duration) * 100;
+  progFill.style.width = pct + '%';
+  curTimeEl.textContent = fmt(audio.currentTime);
+  totTimeEl.textContent = fmt(audio.duration);
+});
+
+audio.addEventListener('ended', () => {
+  isPlaying = false;
+  stopVis();
+  setPlayIcon(false);
+  // Siguiente pista automáticamente
+  const next = (currentIdx + 1) % TRACKS.length;
+  loadTrack(next, true);
+});
+
+audio.addEventListener('error', (e) => {
+  isPlaying = false;
+  wantsPlay = false;
+  stopVis();
+  setPlayIcon(false);
+  const code = audio.error ? audio.error.code : '?';
+  setStatus('⚠ No se pudo cargar el audio (código ' + code + ')');
+  console.error('Audio error:', audio.error, e);
+});
+
+audio.addEventListener('waiting', () => { setStatus('Cargando…'); });
+
+audio.addEventListener('playing', () => {
+  isPlaying = true;
+  wantsPlay = false;
+  setPlayIcon(true);
+  setStatus('Reproduciendo · ' + TRACKS[currentIdx].title);
+  startVis();
+});
+
+audio.addEventListener('pause', () => {
+  if (!audio.ended) {
+    isPlaying = false;
+    stopVis();
+    setPlayIcon(false);
+    setStatus('Pausado · ' + TRACKS[currentIdx].title);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  CONTROLES DE BOTONES
+// ═══════════════════════════════════════════════════════════
+function playPause() {
+  if (!audio.src || audio.src === window.location.href) {
+    loadTrack(0, true);
+    return;
+  }
+  if (isPlaying) {
+    audio.pause();
+  } else {
+    audio.play().catch(err => setStatus('Error: ' + err.message));
+  }
+}
+
+playBtn.addEventListener('click', playPause);
+nextBtn.addEventListener('click', () => loadTrack(currentIdx + 1, isPlaying));
+prevBtn.addEventListener('click', () => {
+  if (audio.currentTime > 3) {
+    audio.currentTime = 0;
+  } else {
+    loadTrack(currentIdx - 1, isPlaying);
+  }
+});
+
+// Soporte touch en botones (evita doble disparo)
+[playBtn, nextBtn, prevBtn].forEach(btn => {
+  btn.addEventListener('touchend', (e) => { e.preventDefault(); btn.click(); });
+});
+
+// ═══════════════════════════════════════════════════════════
+//  BARRA DE PROGRESO (click + touch/drag)
+// ═══════════════════════════════════════════════════════════
+function seekTo(e) {
+  if (!audio.duration) return;
+  const rect = progTrack.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  audio.currentTime = pct * audio.duration;
+  progFill.style.width = (pct * 100) + '%';
+}
+
+progTrack.addEventListener('click', seekTo);
+progTrack.addEventListener('touchstart', seekTo, { passive: true });
+
+// ═══════════════════════════════════════════════════════════
+//  VOLUMEN
+// ═══════════════════════════════════════════════════════════
+audio.volume = 0.8;
+volSlider.addEventListener('input', () => { audio.volume = parseFloat(volSlider.value); });
+
+// ═══════════════════════════════════════════════════════════
+//  OVERLAY DE ENTRADA — soluciona política de autoplay
+// ═══════════════════════════════════════════════════════════
+enterBtn.addEventListener('click', startApp);
+enterBtn.addEventListener('touchend', (e) => { e.preventDefault(); startApp(); });
+
+function startApp() {
+  // Ocultar overlay
+  overlay.style.opacity = '0';
+  overlay.style.transition = 'opacity .4s ease';
+  setTimeout(() => overlay.style.display = 'none', 420);
+
+  // La primera interacción del usuario desbloquea el autoplay
+  // Cargar y reproducir bienvenida.mp3
+  loadTrack(0, true);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INICIALIZACIÓN
+// ═══════════════════════════════════════════════════════════
+buildVisualizer();
+buildPlaylist();
+</script>
+</body>
+</html>
